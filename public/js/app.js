@@ -12,11 +12,22 @@
     } catch { return { ok: false, status: 0, data: { error: 'Sin conexión. Intenta de nuevo.' } }; }
   }
   let toastT; function toast(msg, err) { const t = $('.toast'); if (!t) return; t.textContent = msg; t.classList.toggle('err', !!err); t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 3200); }
-  const track = (type, label) => fetch('/api/track', { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'fetch' }, body: JSON.stringify({ type, label }) }).catch(() => {});
+  const STATIC = document.documentElement.dataset.static === '1';
+  const track = (type, label) => STATIC ? null : fetch('/api/track', { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'fetch' }, body: JSON.stringify({ type, label }) }).catch(() => {});
 
   // Menú móvil
   const tg = $('.nav-toggle'); tg?.addEventListener('click', () => { const o = $('#nav').classList.toggle('open'); tg.setAttribute('aria-expanded', o); });
   $('[data-logout]')?.addEventListener('click', async () => { await api('POST', '/api/logout'); location.href = '/'; });
+
+  // Formularios estáticos (Netlify Forms)
+  $$('form[data-netlify-form]').forEach((f) => f.addEventListener('submit', async (e) => {
+    e.preventDefault(); const msg = $('.form-msg', f), btn = $('button:not([type=button])', f); msg.className = 'form-msg'; msg.textContent = 'Enviando…'; btn && (btn.disabled = true);
+    try {
+      const r = await fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(new FormData(f)).toString() });
+      if (!r.ok) throw new Error(); msg.classList.add('ok'); msg.textContent = f.dataset.ok || 'Listo, ¡gracias!'; f.reset();
+    } catch { msg.classList.add('err'); msg.textContent = 'No se pudo enviar. Inténtalo de nuevo.'; }
+    btn && (btn.disabled = false);
+  }));
 
   // Formularios genéricos
   $$('form[data-api]').forEach((f) => f.addEventListener('submit', async (e) => {

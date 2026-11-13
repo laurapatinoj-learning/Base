@@ -3,6 +3,7 @@ import { ISHANGO } from '../lib/content.js';
 import { isPrime } from '../lib/util.js';
 
 export const SITE_NAME = 'Base Parkway';
+export const STATIC = process.env.STATIC_BUILD === '1';
 export const siteUrl = () => (process.env.SITE_URL || `http://localhost:${process.env.PORT || 3000}`).replace(/\/$/, '');
 
 // Marca: tres capas apiladas (rombo + dos chevrones), tal como el logotipo de Base Parkway.
@@ -33,7 +34,7 @@ export function boneSvg({ animate = true } = {}) {
 ${out}</svg>`);
 }
 
-const NAV = [['/archivo', 'Archivo Ishango'], ['/fichas', 'Fichas'], ['/catalogo', 'Catálogo'], ['/agenda', 'Agenda'], ['/aula', 'Aula'], ['/newsletter', 'Boletín'], ['/contacto', 'Contacto']];
+const NAV = [['/archivo', 'Archivo'], ['/fichas', 'Fichas'], ['/catalogo', 'Catálogo'], ['/agenda', 'Agenda'], ['/aula', 'Aula']];
 
 export function layout(ctx, { title, desc, path, image, jsonld, noindex = false, bodyClass = '', main, hero }) {
   const u = ctx.user; const base = siteUrl();
@@ -42,7 +43,7 @@ export function layout(ctx, { title, desc, path, image, jsonld, noindex = false,
   const canon = base + (path || ctx.url.pathname);
   const img = image || '/img/og-base.svg';
   return html`<!doctype html>
-<html lang="es-CO"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="es-CO" ${STATIC ? raw('data-static="1"') : ''}><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${full}</title><meta name="description" content="${d}">
 ${noindex ? raw('<meta name="robots" content="noindex,nofollow">') : raw(`<link rel="canonical" href="${esc(canon)}">`)}
 <meta property="og:type" content="website"><meta property="og:site_name" content="${SITE_NAME}"><meta property="og:locale" content="es_CO"><meta property="og:title" content="${full}"><meta property="og:description" content="${d}"><meta property="og:url" content="${canon}"><meta property="og:image" content="${base}${img}">
@@ -58,16 +59,16 @@ ${jsonld ? raw(`<script type="application/ld+json">${JSON.stringify(jsonld).repl
 <a class="brand-link" href="/" aria-label="Base Parkway — inicio">${brand()}</a>
 <button class="nav-toggle" aria-expanded="false" aria-controls="nav"><span class="sr">Menú</span><i></i><i></i><i></i></button>
 <nav id="nav" class="nav" aria-label="Principal">${NAV.map(([h, t]) => html`<a href="${h}" ${ctx.url.pathname === h || (h !== '/' && ctx.url.pathname.startsWith(h + '/')) ? raw('aria-current="page"') : ''}>${t}</a>`)}
-<span class="nav-sep"></span>
+${STATIC ? html`<a class="btn sm" href="/contacto">Contacto</a>` : html`<span class="nav-sep"></span>
 <a class="cart-link" href="/carrito" aria-label="Carrito, ${ctx.cartCount} artículos">Carrito <span class="badge" data-cart-count>${ctx.cartCount}</span></a>
-${u ? html`<a href="/pedidos">Mi cuenta</a>${u.role !== 'user' ? html`<a href="/admin">CMS</a>` : ''}<button class="linkish" data-logout>Salir</button>` : html`<a class="btn sm" href="/ingresar">Ingresar</a>`}
+${u ? html`<a href="/pedidos">Mi cuenta</a>${u.role !== 'user' ? html`<a href="/admin">CMS</a>` : ''}<button class="linkish" data-logout>Salir</button>` : html`<a class="btn sm" href="/ingresar">Ingresar</a>`}`}
 </nav></div></header>
 ${hero || ''}
 <main id="contenido" tabindex="-1">${main}</main>
 <footer class="site-footer"><div class="wrap grid4">
 <div>${brand('inv')}<p class="muted">Editorial y aula académica. Archivo principal sobre el hueso de Ishango.</p></div>
 <div><h2>Explorar</h2><ul class="plain"><li><a href="/archivo">Archivo Ishango</a></li><li><a href="/fichas">Fichas editoriales</a></li><li><a href="/catalogo">Catálogo</a></li><li><a href="/agenda">Agenda</a></li></ul></div>
-<div><h2>Comunidad</h2><ul class="plain"><li><a href="/aula">Aula virtual</a></li><li><a href="/newsletter">Boletín</a></li><li><a href="/contacto">Contacto</a></li><li><a href="/ayuda">Manual de uso</a></li><li><a href="/privacidad">Privacidad</a></li></ul></div>
+<div><h2>Comunidad</h2><ul class="plain"><li><a href="/aula">Aula virtual</a></li><li><a href="/newsletter">Boletín</a></li><li><a href="/contacto">Contacto</a></li>${STATIC ? '' : html`<li><a href="/ayuda">Manual de uso</a></li>`}<li><a href="/privacidad">Privacidad</a></li></ul></div>
 <div><h2>Boletín</h2><form class="inline-form" data-api="/api/newsletter" data-ok="Revisa tu correo para confirmar."><label class="sr" for="fn-email">Correo</label><input id="fn-email" name="email" type="email" required placeholder="tu@correo.com" autocomplete="email"><input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true"><button class="btn sm light">Suscribirme</button><p class="form-msg" role="status"></p></form></div>
 </div><div class="wrap legal"><span>© ${new Date().getFullYear()} Base Parkway. Fuente del archivo: <a href="https://periodico.unal.edu.co/articulos/el-enigmatico-hueso-de-ishango-secreto-ancestral-de-numeros-primos-gemelos" rel="noopener">Periódico UNAL</a>.</span><a href="#top">Volver arriba ↑</a></div></footer>
 <div class="toast" role="status" aria-live="polite"></div>
