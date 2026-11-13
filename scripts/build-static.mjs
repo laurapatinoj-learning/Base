@@ -40,6 +40,8 @@ for (const e of events) write(`agenda/${e.slug}.ics`, await get(`/agenda/${e.slu
 write('404.html', clean(await (await fetch(base + '/no-existe')).text(), '/404'));
 const url = process.env.SITE_URL;
 write('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${paths.filter((p) => !p.includes('/leccion/')).map((p) => `<url><loc>${url}${p === '/' ? '' : p}</loc></url>`).join('')}</urlset>`);
+// _headers: aplica las cabeceras de seguridad también cuando se sube la carpeta a mano (netlify.toml solo rige con Git).
+write('_headers', `/*\n  X-Content-Type-Options: nosniff\n  X-Frame-Options: DENY\n  Referrer-Policy: strict-origin-when-cross-origin\n  Permissions-Policy: camera=(), microphone=(), geolocation=()\n  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; form-action 'self'; base-uri 'self'\n/css/*\n  Cache-Control: public, max-age=3600\n/js/*\n  Cache-Control: public, max-age=3600\n/img/*\n  Cache-Control: public, max-age=86400\n`);
 write('robots.txt', `User-agent: *\nAllow: /\nSitemap: ${url}/sitemap.xml\n`);
 for (const f of ['css/app.css', 'js/app.js', 'img/logo.svg', 'img/og-base.svg', 'img/almonacid-autor.jpg']) { mkdirSync(dirname(join(DIST, f)), { recursive: true }); copyFileSync(join(ROOT, 'public', f), join(DIST, f)); }
 mkdirSync(join(DIST, 'recursos'), { recursive: true }); copyFileSync(join(ROOT, 'storage/resources/hoja-de-trabajo-ishango.pdf'), join(DIST, 'recursos/hoja-de-trabajo-ishango.pdf'));
