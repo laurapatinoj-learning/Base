@@ -118,3 +118,49 @@
 .poster-art .dr{stroke-linecap:butt}
 .faq-item summary h2,.band-inline h2,.glance h2,.prof-card .kicker{border:0;padding:0}
 .faq-item summary h2{margin:0}.band-inline h2{margin-top:0}
+
+/* ---------- Portada: números flotantes, ruta de aprendizaje y foto clicable ---------- */
+.float-nums{position:absolute;inset:0;overflow:hidden;pointer-events:none}.hero .wrap{position:relative;z-index:1}
+.fnum{position:absolute;font:600 clamp(1.1rem,2.4vw,2rem) var(--display);font-style:normal;opacity:0;animation:floatNum var(--du,12s) ease-in-out var(--dl,0s) infinite}
+.fnum.t-p{color:#ff6b81}.fnum.t-o{color:#46e0a0}.fnum.t-e{color:#fff}
+@keyframes floatNum{0%{opacity:0;transform:translateY(24px)}25%,70%{opacity:.17}100%{opacity:0;transform:translateY(-34px)}}
+@media(prefers-reduced-motion:reduce){.fnum{animation:none;opacity:.1}}
+.route-sec{background:#fff}.route{list-style:none;padding:0;margin:58px 0 0;display:grid;grid-template-columns:repeat(3,1fr);gap:24px;position:relative}
+.route::before{content:"";position:absolute;left:5%;right:5%;top:-1px;height:3px;background:linear-gradient(90deg,var(--bur),var(--bur-400));transform:scaleX(0);transform-origin:0 50%;transition:transform 1.5s var(--ease);border-radius:3px}.route.in::before{transform:scaleX(1)}
+.step{position:relative;padding:40px 24px 26px;border:1px solid var(--line);border-top:0;border-radius:0 0 var(--r) var(--r);background:#fff;opacity:0;transform:translateY(18px);transition:opacity .6s var(--ease),transform .6s var(--ease),box-shadow .3s}
+.route.in .step{opacity:1;transform:none}.route.in .step:nth-child(2){transition-delay:.35s}.route.in .step:nth-child(3){transition-delay:.7s}.step:hover{box-shadow:0 18px 40px -22px rgba(60,10,25,.45)}
+.step .num{position:absolute;top:-24px;left:24px;width:48px;height:48px;border-radius:50%;background:var(--bur);color:#fff;display:grid;place-items:center;font:600 1.5rem var(--display);box-shadow:0 0 0 7px #fff}
+.step h3{margin:0 0 .3em}.step p:not(.kicker){font-size:.98rem}.step .kicker{margin-bottom:6px}
+.route-also{margin:30px 0 0;font:.85rem var(--ui);color:var(--muted)}
+@media(max-width:820px){.route{grid-template-columns:1fr;gap:48px}.route::before{display:none}}
+.portrait{position:relative}.portrait-link{display:block;text-decoration:none;color:inherit;border-radius:var(--r)}
+.portrait-link .portrait img{transition:transform .5s var(--ease),box-shadow .4s var(--ease)}.portrait-link:hover .portrait img,.portrait-link:focus-visible .portrait img{transform:translate(-4px,-4px);box-shadow:16px 16px 0 var(--bur)}
+.portrait-cta{position:absolute;left:14px;bottom:66px;background:#fff;color:var(--bur);font:600 .8rem var(--ui);padding:9px 14px;border-radius:999px;opacity:0;transform:translateY(8px);transition:.3s var(--ease);box-shadow:0 8px 20px -8px rgba(0,0,0,.45)}
+.portrait-link:hover .portrait-cta,.portrait-link:focus-visible .portrait-cta{opacity:1;transform:none}@media(hover:none){.portrait-cta{opacity:1;transform:none}}
+.byline-photo{display:block;border-radius:50%;flex:none;transition:transform .3s var(--ease),box-shadow .3s}.byline-photo:hover,.byline-photo:focus-visible{transform:scale(1.08);box-shadow:0 0 0 4px var(--bur-200)}
+
+/* ---------- Índice lateral del archivo ---------- */
+.toc{display:none}
+@media(min-width:1320px){.toc{display:block;position:fixed;left:calc(50% - 410px - 236px);top:120px;width:196px;font:500 .8rem/1.4 var(--ui);z-index:5}
+.toc p{font:600 .66rem var(--ui);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}.toc ol{list-style:none;margin:0;padding:0;border-left:2px solid var(--line)}
+.toc a{display:block;padding:6px 0 6px 14px;margin-left:-2px;border-left:2px solid transparent;color:var(--muted);text-decoration:none;transition:.2s}.toc a:hover{color:var(--bur)}.toc a[aria-current=true]{color:var(--bur);border-left-color:var(--bur);font-weight:600}}
+
+/* ---------- Recorrido guiado y cuestionarios ---------- */
+.tour-btn{border-color:var(--bur)!important;color:var(--bur)!important}.tour-btn:hover{background:var(--bur)!important;color:#fff!important}
+.tour{background:#fff;border:1px solid var(--bur);border-left-width:5px;border-radius:12px;padding:16px 18px;margin:0 0 14px;animation:fadeUp .4s var(--ease)}.tour[hidden]{display:none}.tour-step{margin:0 0 12px;font:500 .95rem/1.55 var(--ui)}.tour .row{gap:10px;flex-wrap:wrap}
+.ex-row{transition:opacity .35s}.ex-row.tour-dim{opacity:.2}
+.badge-int{font:600 .62rem var(--ui);letter-spacing:.1em;text-transform:uppercase;background:var(--bur);color:#fff;padding:4px 9px;border-radius:99px;vertical-align:middle;margin-left:8px}
+.qz{background:var(--tint);border:1px solid var(--line);border-radius:var(--r);padding:22px;margin:1em 0}.qz [hidden]{display:none!important}
+.qz-defs{list-style:none;display:flex;flex-wrap:wrap;gap:6px 18px;padding:0;margin:0 0 14px;font:.78rem var(--ui);color:var(--muted)}.qz-defs b{color:var(--ink)}
+.qz-progress{font:600 .72rem var(--ui);letter-spacing:.1em;text-transform:uppercase;color:var(--bur);margin:0 0 8px}
+.qz-q{font:600 1.3rem/1.35 var(--display);margin:0 0 14px}
+.qz-opts{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.qz-opt{font:500 .95rem var(--ui);text-align:left;padding:13px 16px;border-radius:10px;border:1.5px solid #cdbfc4;background:#fff;color:var(--ink);cursor:pointer;transition:.2s}.qz-opt:hover:not(:disabled){border-color:var(--bur);transform:translateY(-2px)}
+.qz-opt:disabled{cursor:default}.qz-opt.right{background:#e8f5ee;border-color:var(--c-odd);color:#0e5a35}.qz-opt.wrong{background:#fdecec;border-color:#c0392b;color:#8e1f14}
+.qz-fb{margin:14px 0 0;padding:12px 14px;border-radius:10px;background:#fdecec;font:.9rem/1.5 var(--ui);animation:fadeUp .4s var(--ease)}.qz-fb.ok{background:#e8f5ee}.qz-fb b{margin-right:4px}
+.qz-next{margin-top:14px}.qz-sum{text-align:center;padding:10px 0}.qz-score{font:600 2.2rem var(--display);margin:0}.qz-sum.great .qz-score{color:var(--c-odd)}.qz-msg{margin:.2em 0 1em}
+
+/* ---------- Preguntas: siguiente y «vista» ---------- */
+.faq-next{margin:1.4em 0 0}.faq-index{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
+.faq-item.seen:not([open]) .qn{background:var(--c-odd);font-size:0}.faq-item.seen:not([open]) .qn::after{content:"✓";font-size:1.2rem}
+.faq-index a.done{border-color:var(--c-odd)}.faq-index a.done b{color:var(--c-odd)}

@@ -18,7 +18,7 @@ const mime = { jpg: 'image/jpeg', svg: 'image/svg+xml', pdf: 'application/pdf' }
 const cache = new Map(); const uri = (p) => { if (!cache.has(p)) cache.set(p, b64(rd('public' + p.replace(/^\/recursos/, '')), mime[p.split('.').pop()])); return cache.get(p); };
 
 const css = rd('public/css/app.css').toString() + '\n' + rd('public/css/extra.css').toString();
-const js = ['app', 'extra', 'motion'].map((n) => rd(`public/js/${n}.js`).toString()).join('\n').replace(/<\/script>/g, '<\\/script>');
+const js = ['app', 'extra', 'motion', 'lab'].map((n) => rd(`public/js/${n}.js`).toString()).join('\n').replace(/<\/script>/g, '<\\/script>');
 const pdf = b64(rd('storage/resources/hoja-de-trabajo-ishango.pdf'), 'application/pdf');
 
 const events = all('SELECT slug FROM events WHERE published=1');
@@ -44,7 +44,7 @@ function transform(h, path) {
   h = h.replace(/ data-add-cart="\d+"/g, '')
     .replace(/<link rel="canonical"[^>]*>/, '').replace(/<link rel="alternate" hreflang[^>]*>/g, '').replace(/<meta property="og:url"[^>]*>/, '')
     .replace('<link rel="stylesheet" href="/css/app.css"><link rel="stylesheet" href="/css/extra.css">', () => `<style>${css}</style>`)
-    .replace('<script src="/js/app.js" defer></script><script src="/js/extra.js" defer></script><script src="/js/motion.js" defer></script>', () => `<script>${js}</script>`)
+    .replace('<script src="/js/app.js" defer></script><script src="/js/extra.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/lab.js" defer></script>', () => `<script>${js}</script>`)
     .replace(/src="(\/img\/[^"]+\.jpg)"/g, (m, p) => `src="${uri(p)}"`);
   return h.replace(/href="(\/[^"]*)"/g, (m, u) => {
     const [pp, hash] = u.split('#'); const clean = pp.split('?')[0].replace(/\/$/, '') || '/';

@@ -5,6 +5,7 @@ import { html, raw, md, money, esc } from '../lib/util.js';
 import { ISHANGO, SRC, SRC_URL } from '../lib/content.js';
 import { tl, pick } from '../lib/i18n.js';
 import '../lib/copy-pages.js';
+import { LAB_A, LAB_B } from '../lib/copy-lab.js';
 import { TR, UNAL_CAPTIONS, UNAL_ALT, LIBRARY } from '../lib/content-i18n.js';
 import { layout, field, crumbs, pageHead, cover, boneSvg, logoMark, siteUrl, SITE_NAME, STATIC, legend, numType } from './layout.js';
 
@@ -20,6 +21,15 @@ const kindLabel = (k, lang) => (lang === 'es' ? k : String(k).replace(/^Ficha (\
 
 export const notFound = (ctx) => { const lang = ctx.lang || 'es', t = tl(lang); return { status: 404, body: layout(ctx, { title: t('notfound.h1'), noindex: true, main: html`<section class="wrap narrow center pad"><p class="kicker">${t('notfound.kicker')}</p><h1>${t('notfound.h1')}</h1><p class="lead">${t('notfound.p')}</p><p><a class="btn" href="/">${t('notfound.home')}</a> <a class="btn ghost" href="/preguntas">${t('nav.faq')}</a></p></section>` }) }; };
 
+// Cuestionario por pasos (kind 'a' = dato/patrón/interpretación; 'b' = repaso de las preguntas frecuentes). La lógica vive en public/js/lab.js.
+const quiz = (items, lang, kind) => {
+  const t = tl(lang); const labels = JSON.stringify(Object.fromEntries([['progress', 'lab.progress'], ['right', 'lab.right'], ['wrong', 'lab.wrong'], ['next', 'lab.next'], ['finish', 'lab.finish'], ['score', 'lab.score'], ['hi', 'lab.msg.hi'], ['mid', 'lab.msg.mid'], ['lo', 'lab.msg.lo']].map(([k, v]) => [k, t(v)])));
+  return html`<div class="qz" data-qz="${kind}" data-labels='${labels}'>${kind === 'a' ? html`<ul class="qz-defs">${['d', 'p', 'i'].map((c) => html`<li><b>${t('lab.cat.' + c)}</b> · ${t('lab.def.' + c)}</li>`)}</ul>` : ''}
+<p class="qz-progress" data-qz-progress aria-live="polite"></p>
+${items.map((it, i) => html`<div class="qz-item" data-i="${i}" ${i ? 'hidden' : ''}><p class="qz-q">${kind === 'a' ? pick(it.s, lang) : pick(it.q, lang)}</p><div class="qz-opts" role="group">${kind === 'a' ? ['d', 'p', 'i'].map((c) => html`<button type="button" class="qz-opt" data-ok="${it.c === c ? 1 : 0}">${t('lab.cat.' + c)}</button>`) : pick(it.o, lang).map((o, oi) => html`<button type="button" class="qz-opt" data-ok="${oi === it.a ? 1 : 0}">${o}</button>`)}</div><p class="qz-fb" hidden role="status"><b></b> <span>${pick(it.e, lang)}</span></p></div>`)}
+<div class="qz-sum" hidden><p class="qz-score"></p><p class="qz-msg"></p><button type="button" class="btn sm" data-qz-retry>${t('lab.retry')}</button></div>
+<button type="button" class="btn sm qz-next" data-qz-next hidden></button></div>`;
+};
 const fig = (file, lang, cls = '') => { const m = UNAL[file]; return html`<figure class="unal ${cls}"><img src="/img/unal/${file}" alt="${pick(UNAL_ALT[file], lang)}" width="${m.w}" height="${m.h}" loading="lazy"><figcaption>${UNAL_CAPTIONS[file][lang]}</figcaption></figure>`; };
 const fichaCard = (f, lang) => html`<article class="card ficha reveal"><p class="kicker">${kindLabel(f.kind, lang)}</p><h3><a href="/fichas/${f.slug}">${f.title}</a></h3><p>${f.summary}</p><a class="more" href="/fichas/${f.slug}">${s(lang, 'Leer ficha', 'Read sheet', 'Ler ficha')} <span aria-hidden="true">→</span></a></article>`;
 const stock = (p, lang) => p.kind === 'physical' ? (p.stock <= 0 ? html`<span class="tag warn">${s(lang, 'Agotado', 'Sold out', 'Esgotado')}</span>` : p.stock <= 5 ? html`<span class="tag warn">${s(lang, 'Quedan ' + p.stock, p.stock + ' left', 'Restam ' + p.stock)}</span>` : html`<span class="tag">${s(lang, 'En stock', 'In stock', 'Em estoque')}</span>`) : html`<span class="tag">${p.kind === 'digital' ? s(lang, 'Digital', 'Digital', 'Digital') : s(lang, 'Aula', 'Classroom', 'Sala de aula')}</span>`;
@@ -32,24 +42,23 @@ export function home(ctx) {
   const lang = ctx.lang || 'es', t = tl(lang), h = H(t);
   const fichas = all('SELECT * FROM fichas WHERE published=1 ORDER BY ord').map((f) => loc('fichas', f, lang));
   const prof = getBlock('profesor-resumen', lang);
-  const hero = html`<section class="hero"><div class="hero-glow" aria-hidden="true"></div><div class="wrap hero-grid">
+  const FN = [[2, 8, 22], [3, 20, 70], [5, 34, 30], [7, 46, 82], [11, 58, 18], [13, 70, 64], [17, 82, 34], [19, 92, 78], [6, 14, 50], [9, 52, 50], [15, 76, 12], [21, 28, 88], [4, 64, 92], [8, 88, 56]];
+  const hero = html`<section class="hero"><div class="hero-glow" aria-hidden="true"></div><div class="float-nums" aria-hidden="true">${FN.map(([n, l, tp], i) => html`<i class="fnum t-${numType(n)}" style="left:${l}%;top:${tp}%;--dl:${((i * 0.7) % 5).toFixed(1)}s;--du:${9 + (i % 5) * 2}s">${n}</i>`)}</div><div class="wrap hero-grid">
 <div class="hero-copy"><p class="kicker light">${t('home.kicker')}</p><h1>${h('home.h1')}</h1><p class="lead">${t('home.lead')}</p>
 <p class="cta"><a class="btn" href="/archivo">${t('home.cta1')}</a> <a class="btn ghost light" href="/preguntas">${t('home.cta2')}</a></p></div>
 <div class="hero-mark" aria-hidden="true">${logoMark('big')}</div></div>
 <div class="wrap hero-bone">${boneSvg({ lang })}${legend(lang)}</div></section>`;
   const main = html`
-<section class="wrap pad split reveal"><figure class="portrait"><img src="/img/almonacid-autor.jpg" width="400" height="400" alt="${t('home.portrait.alt')}" loading="lazy"><figcaption>${t('home.portrait.cap')}</figcaption></figure>
-<div><p class="kicker">${t('home.archive.kicker')}</p><h2>${t('home.archive.h2')}</h2><p>${t('home.archive.p')}</p><p><a class="btn" href="/archivo">${t('home.archive.btn')}</a></p></div></section>
+<section class="route-sec" id="ruta"><div class="wrap pad"><p class="kicker">${t('route.kicker')}</p><h2>${t('route.h2')}</h2>
+<ol class="route" data-route>${[['1', '/preguntas'], ['2', '/archivo'], ['3', '/fichas']].map(([n, href]) => html`<li class="step"><span class="num" aria-hidden="true">${n}</span><p class="kicker">${t(`route.s${n}.k`)}</p><h3>${t(`route.s${n}.t`)}</h3><p>${t(`route.s${n}.p`)}</p><a class="btn sm ${n === '1' ? '' : 'ghost'}" href="${href}">${t(`route.s${n}.c`)}</a></li>`)}</ol>
+<p class="route-also">${t('route.also')}: <a href="/biblioteca">${t('nav.library')}</a> · <a href="/aula">${t('nav.classroom')}</a> · <a href="/catalogo">${t('nav.catalog')}</a> · <a href="/agenda">${t('foot.agenda')}</a></p></div></section>
 <!-- RESUMEN DEL PROFESOR · Edítelo en el CMS (Contenido › Portada · Resumen del profesor) o en lib/content-i18n.js (BLOCKS › profesor-resumen). -->
-<section class="band prof" id="profesor"><div class="wrap pad narrow-ish reveal"><p class="kicker">${t('home.prof.kicker')}</p>
-<div class="prose" data-block="profesor-resumen">${prof ? md(prof.body) : ''}</div><p><a class="more" href="/autor">${t('home.prof.more')} <span aria-hidden="true">→</span></a></p></div></section>
+<section class="band prof" id="profesor"><div class="wrap pad split reveal">
+<a class="portrait-link" href="/autor" aria-label="${t('portrait.aria')}"><figure class="portrait"><img src="/img/almonacid-autor.jpg" width="400" height="400" alt="${t('home.portrait.alt')}" loading="lazy"><span class="portrait-cta">${t('portrait.cta')} →</span><figcaption>${t('home.portrait.cap')}</figcaption></figure></a>
+<div><p class="kicker">${t('home.prof.kicker')}</p><h2>${t('home.prof.h')}</h2><div class="prose" data-block="profesor-resumen">${prof ? md(prof.body) : ''}</div><p><a class="more" href="/autor">${t('home.prof.more')} <span aria-hidden="true">→</span></a></p></div></div></section>
 <section class="wrap pad narrow-ish"><p class="kicker">${t('home.sheets.kicker')}</p><h2>${t('home.sheets.h2')}</h2><ol class="ficha-list">${fichas.map((f) => html`<li class="reveal"><a href="/fichas/${f.slug}"><small>${kindLabel(f.kind, lang)}</small><span>${f.title}</span><i aria-hidden="true">→</i></a></li>`)}</ol></section>
 <section class="band" id="criba"><div class="wrap pad center"><p class="kicker">${t('home.sieve.kicker')}</p><h2>${t('home.sieve.h2')}</h2><p class="muted">${t('home.sieve.p')}</p>
 <div class="row center-row"><button class="btn sm" data-sieve="play">${t('home.sieve.play')}</button><button class="btn sm ghost" data-sieve="reset">${t('home.sieve.reset')}</button></div><div class="sieve" data-sieve-grid aria-label="${t('home.sieve.aria')}"></div>${legend(lang)}<p class="caption" data-sieve-msg role="status">${t('home.sieve.msg')}</p></div></section>
-<section class="band dark"><div class="wrap pad"><div class="tiles">
-<a class="tile reveal" href="/catalogo"><small>${t('nav.catalog')}</small><b>${t('home.tile.catalog')}</b><i aria-hidden="true">→</i></a>
-<a class="tile reveal" href="/aula"><small>${t('nav.classroom')}</small><b>${t('home.tile.classroom')}</b><i aria-hidden="true">→</i></a>
-<a class="tile reveal" href="/agenda"><small>${t('foot.agenda')}</small><b>${t('home.tile.agenda')}</b><i aria-hidden="true">→</i></a></div></div></section>
 <section class="band cta-band"><div class="wrap pad center"><h2>${t('home.nl.h2')}</h2><form class="inline-form big" data-api="/api/newsletter" data-ok="${t('form.nl_ok')}"><label class="sr" for="home-email">${t('form.email')}</label><input id="home-email" name="email" type="email" required placeholder="${t('form.email_ph')}" autocomplete="email"><input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true"><button class="btn">${t('form.subscribe')}</button><p class="form-msg" role="status"></p></form></div></section>`;
   return layout(ctx, { path: '/', main, hero, bodyClass: 'home', desc: t('home.lead') + ' ' + t('foot.tag'), jsonld: { '@context': 'https://schema.org', '@type': 'Organization', name: SITE_NAME, url: siteUrl(), logo: siteUrl() + '/img/logo.svg', description: t('foot.tag') } });
 }
@@ -78,24 +87,27 @@ export function archivo(ctx) {
   const fichas = all('SELECT slug,title,kind FROM fichas WHERE published=1 ORDER BY ord').map((f) => loc('fichas', f, lang));
   const prof = getBlock('profesor-resumen', lang); const nn = (k) => t(k).replace(/^\d+\.\s*/, '');
   const main = html`<article class="wrap article">
+<nav class="toc" data-toc aria-label="${t('toc.title')}"><p>${t('toc.title')}</p><ol><li><a href="#resumen">${t('arc.glance.h')}</a></li><li><a href="#explorador">${nn('arc.h2c')}</a></li><li><a href="#profundizar">${t('arc.deep')}</a></li><li><a href="#ejercicio">${t('lab.a.title').split(':')[0]}</a></li><li><a href="#imagenes">${t('arc.photos.h')}</a></li><li><a href="#consulta">${t('arc.consult.h')}</a></li></ol></nav>
 ${crumbs([[null, t('nav.archive')]], lang)}
 <header class="article-head"><p class="kicker">${t('arc.kicker')}</p><h1>${t('arc.h1')}</h1>
-<div class="byline"><img src="/img/almonacid-autor.jpg" width="88" height="88" alt="${t('home.portrait.alt')}"><p><strong>Juan Jorge Almonacid Sierra</strong><br><span class="muted">${t('arc.role')}</span><br><span class="muted">${t('arc.published')} · <a href="${SRC_URL}" rel="noopener">${t('arc.original')}</a></span></p></div></header>
+<div class="byline"><a class="byline-photo" href="/autor" aria-label="${t('portrait.aria')}" title="${t('portrait.cta')}"><img src="/img/almonacid-autor.jpg" width="88" height="88" alt="${t('home.portrait.alt')}"></a><p><strong>Juan Jorge Almonacid Sierra</strong><br><span class="muted">${t('arc.role')}</span><br><span class="muted">${t('arc.published')} · <a href="${SRC_URL}" rel="noopener">${t('arc.original')}</a></span></p></div></header>
 <p class="lead drop">${h('arc.lead')}</p>
 ${fig('unal-1.jpg', lang, 'wide')}
-<aside class="glance"><h2>${t('arc.glance.h')}</h2><ul><li>${h('arc.glance.1')}</li><li>${h('arc.glance.2')}</li><li>${h('arc.glance.3')}</li></ul><p class="small muted">${t('arc.glance.src')} <a href="${SRC_URL}" rel="noopener">Periódico UNAL</a>.</p></aside>
+<aside class="glance" id="resumen"><h2>${t('arc.glance.h')}</h2><ul><li>${h('arc.glance.1')}</li><li>${h('arc.glance.2')}</li><li>${h('arc.glance.3')}</li></ul><p class="small muted">${t('arc.glance.src')} <a href="${SRC_URL}" rel="noopener">Periódico UNAL</a>.</p></aside>
 <!-- RESUMEN DEL PROFESOR (mismo bloque editable de la portada) -->
 <aside class="prof-card"><p class="kicker">${t('home.prof.kicker')}</p><div class="prose" data-block="profesor-resumen">${prof ? md(prof.body) : ''}</div><p><a class="more" href="/autor">${t('home.prof.more')} →</a></p></aside>
 
 <h2>${nn('arc.h2a')}</h2><p>${h('arc.p2a')}</p><p>${h('arc.p2b')}</p>
 <h2 id="explorador">${nn('arc.h2c')}</h2><p>${t('arc.p4')}</p>
 <div class="explorer" data-explorer>${legend(lang)}
-<div class="ex-controls" role="group" aria-label="${t('ex.cols')}"><button class="chip" aria-pressed="false" data-toggle="twins">${t('ex.twins')}</button><button class="chip" aria-pressed="false" data-toggle="sums">${t('ex.sums')}</button></div>
+<div class="ex-controls" role="group" aria-label="${t('ex.cols')}"><button class="chip" aria-pressed="false" data-toggle="twins">${t('ex.twins')}</button><button class="chip" aria-pressed="false" data-toggle="sums">${t('ex.sums')}</button><button class="chip tour-btn" type="button" data-tour-start>▶ ${t('tour.start')}</button></div>
+<div class="tour" data-tour hidden role="region" aria-label="${t('tour.label')}"><p class="tour-step" data-tour-text aria-live="polite"></p><div class="row"><button type="button" class="btn sm ghost" data-tour-prev>${t('tour.prev')}</button><button type="button" class="btn sm" data-tour-next>${t('tour.next')}</button><button type="button" class="linkish" data-tour-close>${t('tour.close')}</button></div></div>
 ${['G', 'M', 'D'].map((c) => explorerRow(c, lang))}
 <p class="ex-readout" data-readout role="status" aria-live="polite">${t('ex.readout')}</p>
 <dl class="ex-stats"><div><dt>${t('ex.marks')}</dt><dd>168</dd></div><div><dt>${t('ex.groups')}</dt><dd>16</dd></div><div><dt>${t('ex.primes')}</dt><dd data-stat="primes">—</dd></div><div><dt>${t('ex.pairs')}</dt><dd data-stat="twins">—</dd></div></dl></div>
 ${fig('unal-5.jpg', lang, 'tall')}
-<p class="kicker deep">${t('arc.deep')}</p>
+<p class="kicker deep" id="profundizar">${t('arc.deep')}</p>
+<details class="fold lab" id="ejercicio"><summary>${t('lab.a.title')} <span class="badge-int">${s(lang, 'Interactivo', 'Interactive', 'Interativo')}</span></summary><p>${t('lab.a.intro')}</p>${quiz(LAB_A, lang, 'a')}</details>
 <details class="fold"><summary>${nn('arc.h2b')}</summary><p>${h('arc.p3')}</p></details>
 <details class="fold"><summary>${nn('arc.h2d')}</summary><p>${h('arc.p5')}</p></details>
 <details class="fold" id="empedocles"><summary>${nn('arc.h2e')}</summary><p>${h('arc.p6')}</p>
@@ -105,8 +117,8 @@ ${empChart(lang)}${legend(lang, ['p', 'o'])}<p class="ex-readout light" data-emp
 ${fig('unal-4.jpg', lang, 'wide')}</details>
 <details class="fold"><summary>${nn('arc.h2f')}</summary><p>${h('arc.p7')}</p><blockquote>${t('arc.quote')}</blockquote></details>
 <details class="fold"><summary>${nn('arc.h2g')}</summary><p>${t('arc.p8')}</p></details>
-<details class="fold"><summary>${t('arc.photos.h')}</summary><p class="muted">${t('arc.photos.p')}</p><div class="gallery">${['unal-8.jpg', 'unal-2.jpg', 'unal-3.jpg'].map((f) => fig(f, lang))}</div></details>
-<section class="band-inline consult"><h2>${t('arc.consult.h')}</h2><p>${t('arc.consult.p')}</p><p><a class="btn" href="/biblioteca#consulta">${t('arc.consult.btn')}</a></p></section>
+<details class="fold" id="imagenes"><summary>${t('arc.photos.h')}</summary><p class="muted">${t('arc.photos.p')}</p><div class="gallery">${['unal-8.jpg', 'unal-2.jpg', 'unal-3.jpg'].map((f) => fig(f, lang))}</div></details>
+<section class="band-inline consult" id="consulta"><h2>${t('arc.consult.h')}</h2><p>${t('arc.consult.p')}</p><p><a class="btn" href="/biblioteca#consulta">${t('arc.consult.btn')}</a></p></section>
 <section class="band-inline"><h2>${t('arc.more.h')}</h2><ul class="plain cols">${fichas.map((f) => html`<li><a href="/fichas/${f.slug}"><small>${kindLabel(f.kind, lang)}</small><br>${f.title}</a></li>`)}</ul><p><a class="btn" href="/preguntas">${t('arc.faq')}</a> <a class="btn ghost" href="/aula">${t('arc.class')}</a>${STATIC ? '' : html` <a class="btn ghost" href="/catalogo/dossier-ishango-pdf">${t('arc.dl')}</a>`}</p></section>
 <section class="cite"><h2>${t('arc.cite.h')}</h2><p>${SRC}</p><p><a href="${SRC_URL}" rel="noopener">${SRC_URL}</a></p><p class="muted">${t('arc.cite.img')}</p></section>
 </article>`;
@@ -138,10 +150,10 @@ export function preguntas(ctx) {
   const lang = ctx.lang || 'es', t = tl(lang), h = H(t);
   const tr = (k) => JSON.stringify([1, 2, 3, 4, 5].map((i) => [t('tl.m' + i), t('tl.y' + i), t('tl.d' + i)]));
   const nums = Array.from({ length: 40 }, (_, i) => i + 1);
-  const Q = (n, body) => html`<details class="faq-item" id="q${n}" name="faq" ${n === 1 ? 'open' : ''}><summary><span class="qn" aria-hidden="true">${n}</span><h2 id="q${n}-h">${t(`q${n}.q`).replace(/^\d\.\s*/, '')}</h2></summary><div class="faq-body">${body}</div></details>`;
+  const Q = (n, body) => html`<details class="faq-item" id="q${n}" name="faq" ${n === 1 ? 'open' : ''}><summary><span class="qn" aria-hidden="true">${n}</span><h2 id="q${n}-h">${t(`q${n}.q`).replace(/^\d\.\s*/, '')}</h2></summary><div class="faq-body">${body}${n < 6 ? html`<p class="faq-next"><button type="button" class="btn sm ghost" data-faq-next="${n + 1}">${t('faq.nextq')}</button></p>` : ''}</div></details>`;
   const main = html`<div class="wrap article faq">
 ${crumbs([[null, t('nav.faq')]], lang)}
-<nav class="faq-index" aria-label="${t('faq.index')}">${[1, 2, 3, 4, 5].map((n) => html`<a href="#q${n}"><b>${n}</b><span>${t(`q${n}.q`).replace(/^\d\.\s*/, '')}</span></a>`)}</nav>
+<nav class="faq-index" aria-label="${t('faq.index')}">${[1, 2, 3, 4, 5, 6].map((n) => html`<a href="#q${n}"><b>${n}</b><span>${t(`q${n}.q`).replace(/^\d\.\s*/, '')}</span></a>`)}</nav>
 ${Q(1, html`${h('q1.a')}<div class="timeline" data-timeline data-tl='${tr()}'><div class="track"><i></i></div>${tlMarks.map(([yrs, i]) => html`<button type="button" class="tl-m" style="left:${100 - (yrs / 20000) * 100}%" data-i="${i}" aria-label="${t('tl.m' + i)} — ${t('tl.y' + i)}"><span class="dot"></span><span class="nm">${t('tl.m' + i)}</span></button>`)}</div><p class="tl-detail" data-tl-detail role="status" aria-live="polite">${t('tl.hint')}</p><p class="small muted">${t('tl.note')}</p>`)}
 ${Q(2, html`${h('q2.a')}<figure class="map" data-map><div class="map-box">${mapSvg(lang)}</div><div class="map-ctl"><button type="button" class="btn sm" data-map-zoom="in">${t('map.zoomin')}</button><button type="button" class="btn sm ghost" data-map-zoom="out">${t('map.zoomout')}</button><a class="btn sm ghost" href="https://www.openstreetmap.org/?mlat=-0.14&mlon=29.59#map=9/-0.14/29.59" rel="noopener" target="_blank">${t('map.real')}</a></div><figcaption>${t('map.hint')} ${t('map.note')}</figcaption></figure>${fig('unal-2.jpg', lang)}`)}
 ${Q(3, html`${h('q3.a')}<figure class="poster"><div class="poster-art" data-draw role="img" aria-label="${t('poster.alt')}">${raw(POSTER[lang] || POSTER.es)}</div><figcaption>${t('poster.cap')} <a href="/img/lamina-${lang}.svg" download>${t('poster.dl')}</a></figcaption></figure><div class="gallery two">${fig('unal-8.jpg', lang)}${fig('unal-3.jpg', lang)}</div>`)}
@@ -149,6 +161,7 @@ ${Q(4, html`${h('q4.a')}<div class="notch" data-notch><h3>${t('notch.title')}</h
 ${Q(5, html`<div class="faq-cols"><div><h3>${t('q5.prime.h')}</h3>${h('q5.prime.p')}</div><div><h3>${t('q5.twin.h')}</h3>${h('q5.twin.p')}</div></div>
 <div class="numgrid" data-numgrid><h3>${t('grid.title')}</h3><div class="ng">${nums.map((n) => html`<button type="button" class="n-${numType(n)}" data-n="${n}">${n}</button>`)}</div>${legend(lang)}<p class="ex-readout light" data-grid-readout role="status" aria-live="polite">${t('grid.hint')}</p></div>
 <h3>${t('q5.use.h')}</h3><div class="grid2 uses">${[1, 2, 3, 4].map((i) => html`<div class="card use reveal"><h4>${t('q5.use' + i + '.h')}</h4><p>${t('q5.use' + i + '.p')}</p></div>`)}</div>`)}
+${Q(6, html`<p>${t('q6.lead')}</p>${quiz(LAB_B, lang, 'b')}`)}
 <section class="band-inline"><h2>${t('faq.next.h')}</h2><p><a class="btn" href="/archivo">${t('faq.next.archive')}</a> <a class="btn ghost" href="/aula">${t('faq.next.class')}</a> <a class="btn ghost" href="/biblioteca#consulta">${t('faq.next.ask')}</a></p></section></div>`;
   return layout(ctx, { title: t('faq.title'), path: '/preguntas', desc: t('faq.desc'), main: html`${pageHead(t('faq.kicker'), t('faq.title'), t('faq.lead'))}${main}`,
     jsonld: { '@context': 'https://schema.org', '@type': 'FAQPage', inLanguage: lang, mainEntity: [1, 2, 3, 4, 5].map((n) => ({ '@type': 'Question', name: t(`q${n}.q`).replace(/^\d\.\s*/, ''), acceptedAnswer: { '@type': 'Answer', text: (t(`q${n}.a`) || '').replace(/<[^>]+>/g, '') || t(`q${n}.q`) } })) } });

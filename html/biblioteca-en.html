@@ -277,6 +277,52 @@ fieldset{border:0;padding:0;margin:0 0 22px}legend{font-weight:600;margin-bottom
 .poster-art .dr{stroke-linecap:butt}
 .faq-item summary h2,.band-inline h2,.glance h2,.prof-card .kicker{border:0;padding:0}
 .faq-item summary h2{margin:0}.band-inline h2{margin-top:0}
+
+/* ---------- Portada: números flotantes, ruta de aprendizaje y foto clicable ---------- */
+.float-nums{position:absolute;inset:0;overflow:hidden;pointer-events:none}.hero .wrap{position:relative;z-index:1}
+.fnum{position:absolute;font:600 clamp(1.1rem,2.4vw,2rem) var(--display);font-style:normal;opacity:0;animation:floatNum var(--du,12s) ease-in-out var(--dl,0s) infinite}
+.fnum.t-p{color:#ff6b81}.fnum.t-o{color:#46e0a0}.fnum.t-e{color:#fff}
+@keyframes floatNum{0%{opacity:0;transform:translateY(24px)}25%,70%{opacity:.17}100%{opacity:0;transform:translateY(-34px)}}
+@media(prefers-reduced-motion:reduce){.fnum{animation:none;opacity:.1}}
+.route-sec{background:#fff}.route{list-style:none;padding:0;margin:58px 0 0;display:grid;grid-template-columns:repeat(3,1fr);gap:24px;position:relative}
+.route::before{content:"";position:absolute;left:5%;right:5%;top:-1px;height:3px;background:linear-gradient(90deg,var(--bur),var(--bur-400));transform:scaleX(0);transform-origin:0 50%;transition:transform 1.5s var(--ease);border-radius:3px}.route.in::before{transform:scaleX(1)}
+.step{position:relative;padding:40px 24px 26px;border:1px solid var(--line);border-top:0;border-radius:0 0 var(--r) var(--r);background:#fff;opacity:0;transform:translateY(18px);transition:opacity .6s var(--ease),transform .6s var(--ease),box-shadow .3s}
+.route.in .step{opacity:1;transform:none}.route.in .step:nth-child(2){transition-delay:.35s}.route.in .step:nth-child(3){transition-delay:.7s}.step:hover{box-shadow:0 18px 40px -22px rgba(60,10,25,.45)}
+.step .num{position:absolute;top:-24px;left:24px;width:48px;height:48px;border-radius:50%;background:var(--bur);color:#fff;display:grid;place-items:center;font:600 1.5rem var(--display);box-shadow:0 0 0 7px #fff}
+.step h3{margin:0 0 .3em}.step p:not(.kicker){font-size:.98rem}.step .kicker{margin-bottom:6px}
+.route-also{margin:30px 0 0;font:.85rem var(--ui);color:var(--muted)}
+@media(max-width:820px){.route{grid-template-columns:1fr;gap:48px}.route::before{display:none}}
+.portrait{position:relative}.portrait-link{display:block;text-decoration:none;color:inherit;border-radius:var(--r)}
+.portrait-link .portrait img{transition:transform .5s var(--ease),box-shadow .4s var(--ease)}.portrait-link:hover .portrait img,.portrait-link:focus-visible .portrait img{transform:translate(-4px,-4px);box-shadow:16px 16px 0 var(--bur)}
+.portrait-cta{position:absolute;left:14px;bottom:66px;background:#fff;color:var(--bur);font:600 .8rem var(--ui);padding:9px 14px;border-radius:999px;opacity:0;transform:translateY(8px);transition:.3s var(--ease);box-shadow:0 8px 20px -8px rgba(0,0,0,.45)}
+.portrait-link:hover .portrait-cta,.portrait-link:focus-visible .portrait-cta{opacity:1;transform:none}@media(hover:none){.portrait-cta{opacity:1;transform:none}}
+.byline-photo{display:block;border-radius:50%;flex:none;transition:transform .3s var(--ease),box-shadow .3s}.byline-photo:hover,.byline-photo:focus-visible{transform:scale(1.08);box-shadow:0 0 0 4px var(--bur-200)}
+
+/* ---------- Índice lateral del archivo ---------- */
+.toc{display:none}
+@media(min-width:1320px){.toc{display:block;position:fixed;left:calc(50% - 410px - 236px);top:120px;width:196px;font:500 .8rem/1.4 var(--ui);z-index:5}
+.toc p{font:600 .66rem var(--ui);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}.toc ol{list-style:none;margin:0;padding:0;border-left:2px solid var(--line)}
+.toc a{display:block;padding:6px 0 6px 14px;margin-left:-2px;border-left:2px solid transparent;color:var(--muted);text-decoration:none;transition:.2s}.toc a:hover{color:var(--bur)}.toc a[aria-current=true]{color:var(--bur);border-left-color:var(--bur);font-weight:600}}
+
+/* ---------- Recorrido guiado y cuestionarios ---------- */
+.tour-btn{border-color:var(--bur)!important;color:var(--bur)!important}.tour-btn:hover{background:var(--bur)!important;color:#fff!important}
+.tour{background:#fff;border:1px solid var(--bur);border-left-width:5px;border-radius:12px;padding:16px 18px;margin:0 0 14px;animation:fadeUp .4s var(--ease)}.tour[hidden]{display:none}.tour-step{margin:0 0 12px;font:500 .95rem/1.55 var(--ui)}.tour .row{gap:10px;flex-wrap:wrap}
+.ex-row{transition:opacity .35s}.ex-row.tour-dim{opacity:.2}
+.badge-int{font:600 .62rem var(--ui);letter-spacing:.1em;text-transform:uppercase;background:var(--bur);color:#fff;padding:4px 9px;border-radius:99px;vertical-align:middle;margin-left:8px}
+.qz{background:var(--tint);border:1px solid var(--line);border-radius:var(--r);padding:22px;margin:1em 0}.qz [hidden]{display:none!important}
+.qz-defs{list-style:none;display:flex;flex-wrap:wrap;gap:6px 18px;padding:0;margin:0 0 14px;font:.78rem var(--ui);color:var(--muted)}.qz-defs b{color:var(--ink)}
+.qz-progress{font:600 .72rem var(--ui);letter-spacing:.1em;text-transform:uppercase;color:var(--bur);margin:0 0 8px}
+.qz-q{font:600 1.3rem/1.35 var(--display);margin:0 0 14px}
+.qz-opts{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.qz-opt{font:500 .95rem var(--ui);text-align:left;padding:13px 16px;border-radius:10px;border:1.5px solid #cdbfc4;background:#fff;color:var(--ink);cursor:pointer;transition:.2s}.qz-opt:hover:not(:disabled){border-color:var(--bur);transform:translateY(-2px)}
+.qz-opt:disabled{cursor:default}.qz-opt.right{background:#e8f5ee;border-color:var(--c-odd);color:#0e5a35}.qz-opt.wrong{background:#fdecec;border-color:#c0392b;color:#8e1f14}
+.qz-fb{margin:14px 0 0;padding:12px 14px;border-radius:10px;background:#fdecec;font:.9rem/1.5 var(--ui);animation:fadeUp .4s var(--ease)}.qz-fb.ok{background:#e8f5ee}.qz-fb b{margin-right:4px}
+.qz-next{margin-top:14px}.qz-sum{text-align:center;padding:10px 0}.qz-score{font:600 2.2rem var(--display);margin:0}.qz-sum.great .qz-score{color:var(--c-odd)}.qz-msg{margin:.2em 0 1em}
+
+/* ---------- Preguntas: siguiente y «vista» ---------- */
+.faq-next{margin:1.4em 0 0}.faq-index{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
+.faq-item.seen:not([open]) .qn{background:var(--c-odd);font-size:0}.faq-item.seen:not([open]) .qn::after{content:"✓";font-size:1.2rem}
+.faq-index a.done{border-color:var(--c-odd)}.faq-index a.done b{color:var(--c-odd)}
 </style>
 
 </head><body class="">
@@ -287,7 +333,7 @@ fieldset{border:0;padding:0;margin:0 0 22px}legend{font-weight:600;margin-bottom
 <path class="l l2" d="M8 53 L50 75 L92 53" fill="none" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
 <path class="l l3" d="M8 72 L50 94 L92 72" fill="none" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wordmark"><b>BASE</b><span>Parkway</span></span></span></a>
 <button class="nav-toggle" aria-expanded="false" aria-controls="nav"><span class="sr">Menu</span><i></i><i></i><i></i></button>
-<nav id="nav" class="nav" aria-label="Main"><a href="archivo-en.html" >Archive</a><a href="preguntas-en.html" >Questions</a><a href="fichas-en.html" >Sheets</a><a href="biblioteca-en.html" aria-current="page">Library</a><a href="catalogo-en.html" >Catalog</a><a href="aula-en.html" >Classroom</a>
+<nav id="nav" class="nav" aria-label="Main"><a href="preguntas-en.html" >Questions</a><a href="archivo-en.html" >Archive</a><a href="fichas-en.html" >Sheets</a><a href="aula-en.html" >Classroom</a><a href="biblioteca-en.html" aria-current="page">Library</a><a href="catalogo-en.html" >Catalog</a>
 <a class="btn sm" href="contacto-en.html">Contact</a>
 <span class="nav-sep"></span>
 <div class="lang" role="group" aria-label="Language"><a href="biblioteca.html" hreflang="es" lang="es" title="Español" >ES</a><a href="biblioteca-en.html" hreflang="en" lang="en" title="English" aria-current="true">EN</a><a href="biblioteca-pt.html" hreflang="pt" lang="pt" title="Português" >PT</a></div>
@@ -547,5 +593,68 @@ fieldset{border:0;padding:0;margin:0 0 22px}legend{font-weight:600;margin-bottom
   const openHash = () => { const id = decodeURIComponent(location.hash.slice(1)); if (!id) return; const el = document.getElementById(id); if (!el) return; const d = el.tagName === 'DETAILS' ? el : el.closest('details'); if (d) { d.open = true; setTimeout(() => el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }), 60); } };
   addEventListener('hashchange', openHash); openHash();
   $$('.faq-index a').forEach((a) => a.addEventListener('click', () => setTimeout(openHash, 0)));
+})();
+
+(() => {
+  'use strict';
+  const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const L = (document.documentElement.lang || 'es').slice(0, 2); const lang = ['es', 'en', 'pt'].includes(L) ? L : 'es';
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const store = { get: (k) => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch { return null; } }, set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* opcional */ } } };
+
+  // ---- Cuestionarios por pasos (ejercicio dato/patrón/interpretación y repaso final)
+  $$('[data-qz]').forEach((q) => {
+    const T = JSON.parse(q.dataset.labels); const items = $$('.qz-item', q), total = items.length; let i = 0, score = 0;
+    const prog = $('[data-qz-progress]', q), next = $('[data-qz-next]', q), sum = $('.qz-sum', q);
+    const fmt = (s, o) => s.replace(/\{(\w+)\}/g, (m, k) => o[k]);
+    const show = (n) => { i = n; items.forEach((it, k) => (it.hidden = k !== n)); prog.hidden = false; prog.textContent = fmt(T.progress, { i: n + 1, t: total }); next.hidden = true; sum.hidden = true; };
+    const finish = () => { items.forEach((it) => (it.hidden = true)); prog.hidden = true; next.hidden = true; sum.hidden = false; $('.qz-score', sum).textContent = fmt(T.score, { n: score, t: total }); const r = score / total; $('.qz-msg', sum).textContent = r >= 0.8 ? T.hi : r >= 0.5 ? T.mid : T.lo; sum.classList.toggle('great', r >= 0.8); };
+    items.forEach((it, k) => $$('.qz-opt', it).forEach((b) => b.addEventListener('click', () => {
+      if (it.dataset.done) return; it.dataset.done = '1'; const ok = b.dataset.ok === '1'; if (ok) score++;
+      $$('.qz-opt', it).forEach((o) => { o.disabled = true; if (o.dataset.ok === '1') o.classList.add('right'); }); if (!ok) b.classList.add('wrong');
+      const fb = $('.qz-fb', it); $('b', fb).textContent = ok ? T.right : T.wrong; fb.classList.toggle('ok', ok); fb.hidden = false;
+      next.textContent = k === total - 1 ? T.finish : T.next; next.hidden = false;
+    })));
+    next.addEventListener('click', () => (i < total - 1 ? show(i + 1) : finish()));
+    $('[data-qz-retry]', q).addEventListener('click', () => { score = 0; items.forEach((it) => { delete it.dataset.done; $('.qz-fb', it).hidden = true; $$('.qz-opt', it).forEach((o) => { o.disabled = false; o.classList.remove('right', 'wrong'); }); }); show(0); });
+    show(0);
+  });
+
+  // ---- Recorrido guiado de la tabla de Ishango
+  const ex = $('[data-explorer]'), tour = $('[data-tour]');
+  if (ex && tour) {
+    const TXT = { es: ['Columna izquierda (G): 11, 13, 17, 19. Los cuatro números son primos y suman 60.', 'Columna derecha (D): 11, 21, 19, 9. Hay dos primos (11 y 19) y dos compuestos impares (21 y 9). También suma 60.', 'Columna central (M): 3, 6, 4, 8, 10, 5, 5, 7. Los primos son 3, 5, 5 y 7; los compuestos pares, 6, 4, 8 y 10. Suma 48.', 'Primos gemelos: en M aparecen (3, 5) y (5, 7); en G, (11, 13) y (17, 19). Son cuatro parejas.', 'En total: 48 + 60 + 60 = 168 marcas, en 16 grupos. 10 de los 16 números son primos.'],
+      en: ['Left column (G): 11, 13, 17, 19. All four numbers are prime and add up to 60.', 'Right column (D): 11, 21, 19, 9. Two primes (11 and 19) and two odd composites (21 and 9). It also adds up to 60.', 'Central column (M): 3, 6, 4, 8, 10, 5, 5, 7. The primes are 3, 5, 5 and 7; the even composites, 6, 4, 8 and 10. It adds up to 48.', 'Twin primes: in M we find (3, 5) and (5, 7); in G, (11, 13) and (17, 19). That makes four pairs.', 'In total: 48 + 60 + 60 = 168 marks, in 16 groups. 10 of the 16 numbers are prime.'],
+      pt: ['Coluna esquerda (G): 11, 13, 17, 19. Os quatro números são primos e somam 60.', 'Coluna direita (D): 11, 21, 19, 9. Há dois primos (11 e 19) e dois compostos ímpares (21 e 9). Também soma 60.', 'Coluna central (M): 3, 6, 4, 8, 10, 5, 5, 7. Os primos são 3, 5, 5 e 7; os compostos pares, 6, 4, 8 e 10. Soma 48.', 'Primos gêmeos: em M aparecem (3, 5) e (5, 7); em G, (11, 13) e (17, 19). São quatro pares.', 'No total: 48 + 60 + 60 = 168 marcas, em 16 grupos. 10 dos 16 números são primos.'] }[lang];
+    const ROWS = [['G'], ['D'], ['M'], ['G', 'M'], ['G', 'M', 'D']]; const text = $('[data-tour-text]', tour), prev = $('[data-tour-prev]', tour), nxt = $('[data-tour-next]', tour); let s = 0;
+    const END = { es: 'Terminar', en: 'Finish', pt: 'Concluir' }[lang], NEXT = nxt.textContent;
+    const setToggle = (name, on) => { ex.classList.toggle('show-' + name, on); const b = $(`[data-toggle=${name}]`, ex); if (b) b.setAttribute('aria-pressed', on); };
+    const render = () => { text.textContent = TXT[s]; $$('.ex-row', ex).forEach((r) => r.classList.toggle('tour-dim', !ROWS[s].includes(r.dataset.col))); setToggle('twins', s === 3); setToggle('sums', s === 4 || s === 0 || s === 1 || s === 2); prev.disabled = s === 0; nxt.textContent = s === TXT.length - 1 ? END : NEXT; };
+    const close = () => { tour.hidden = true; $$('.ex-row', ex).forEach((r) => r.classList.remove('tour-dim')); setToggle('twins', false); setToggle('sums', false); };
+    $('[data-tour-start]', ex).addEventListener('click', () => { s = 0; tour.hidden = false; render(); });
+    prev.addEventListener('click', () => { if (s > 0) { s--; render(); } }); nxt.addEventListener('click', () => { if (s < TXT.length - 1) { s++; render(); } else close(); });
+    $('[data-tour-close]', tour).addEventListener('click', close);
+  }
+
+  // ---- Índice lateral con resaltado de la sección visible
+  const toc = $('[data-toc]');
+  if (toc) {
+    const links = $$('a', toc); const targets = links.map((a) => [document.getElementById(a.getAttribute('href').slice(1)), a]).filter(([el]) => el); let busy = false;
+    const spy = () => { busy = false; let cur = targets[0]; for (const t of targets) { if (t[0].getBoundingClientRect().top <= innerHeight * 0.3) cur = t; } links.forEach((a) => a.removeAttribute('aria-current')); cur[1].setAttribute('aria-current', 'true'); };
+    addEventListener('scroll', () => { if (!busy) { busy = true; requestAnimationFrame(spy); } }, { passive: true }); spy();
+  }
+
+  // ---- Preguntas: siguiente pregunta y marca de «vista»
+  const items = $$('details.faq-item');
+  if (items.length) {
+    const seen = new Set(store.get('bp-faq-seen') || []); const mark = (d) => { d.classList.add('seen'); const a = $(`.faq-index a[href="#${d.id}"]`); a && a.classList.add('done'); };
+    items.forEach((d) => { if (seen.has(d.id) && !d.open) mark(d); if (d.open) { seen.add(d.id); mark(d); } d.addEventListener('toggle', () => { if (d.open) { seen.add(d.id); mark(d); store.set('bp-faq-seen', [...seen]); } }); });
+    store.set('bp-faq-seen', [...seen]);
+    $$('[data-faq-next]').forEach((b) => b.addEventListener('click', () => { const d = document.getElementById('q' + b.dataset.faqNext); if (!d) return; d.open = true; setTimeout(() => d.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }), 80); }));
+  }
+
+  // ---- Ruta de aprendizaje: aparece el trazo y los pasos
+  const route = $('[data-route]');
+  if (route) { const io = 'IntersectionObserver' in window ? new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { route.classList.add('in'); io.disconnect(); } }), { threshold: 0.25 }) : null; io ? io.observe(route) : route.classList.add('in'); }
 })();
 </script></body></html>

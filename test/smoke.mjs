@@ -191,7 +191,7 @@ ok((await anon.get('/en/no-existe')).status === 404 && /We could not find that p
 
 section('9. Experiencia para todo público: acordeón, plano animado con el babuino y movimiento');
 const fq = (await anon.get('/preguntas')).text;
-ok((fq.match(/<details class="faq-item"/g) || []).length === 5 && /name="faq"/.test(fq) && (fq.match(/<details class="faq-item"[^>]* open>/g) || []).length === 1, 'Preguntas como acordeón exclusivo: 5 preguntas y solo la primera abierta');
+ok((fq.match(/<details class="faq-item"/g) || []).length === 6 && /name="faq"/.test(fq) && (fq.match(/<details class="faq-item"[^>]* open>/g) || []).length === 1, 'Preguntas como acordeón exclusivo: 5 preguntas + repaso, y solo la primera abierta');
 ok(/data-draw/.test(fq) && /class="baboon"/.test(fq) && /data:image\/webp;base64,/.test(fq) && /class="dr"/.test(fq), 'Plano con la ilustración del babuino y líneas animables');
 for (const [l, title] of [['es', 'BABUINO'], ['en', 'BABOON'], ['pt', 'BABUÍNO']]) { const sv = await anon.get(`/img/lamina-${l}.svg`); ok(sv.status === 200 && sv.text.includes(title) && sv.text.includes('Papio sp.') && (sv.text.match(/class="fu"/g) || []).length >= 168, `Lámina descargable (${l.toUpperCase()}) con título, especie y las 168 marcas`); }
 ok((await anon.get('/img/babuino-lineas.webp')).status === 200, 'Ilustración del babuino disponible');
@@ -199,5 +199,24 @@ ok(/Para profundizar/.test((await anon.get('/archivo')).text) && ((await anon.ge
 ok(/Go deeper/.test((await anon.get('/en/archivo')).text) && /Aprofundar/.test((await anon.get('/pt/archivo')).text), 'Apartados plegables traducidos');
 ok((await anon.get('/js/motion.js')).status === 200 && /read-progress/.test((await anon.get('/js/motion.js')).text) && /view-transition/.test((await anon.get('/css/extra.css')).text), 'Barra de progreso de lectura y transiciones entre páginas');
 ok(/prefers-reduced-motion/.test((await anon.get('/css/extra.css')).text), 'El movimiento respeta «reducir movimiento»');
+
+section('10. Foto clicable, ruta de aprendizaje, estructura y ejercicios académicos');
+const hm = (await anon.get('/')).text, ar = (await anon.get('/archivo')).text;
+ok(/<a class="portrait-link" href="\/autor"/.test(hm) && /Ver perfil/.test(hm), 'Portada: la foto del profesor enlaza a su perfil');
+ok(/<a class="byline-photo" href="\/autor"/.test(ar), 'Archivo: la foto del autor enlaza a su perfil');
+ok(/href="\/en\/autor"/.test((await anon.get('/en/')).text) && /href="\/pt\/autor"/.test((await anon.get('/pt/')).text), 'El enlace del perfil conserva el idioma');
+ok((hm.match(/class="step"/g) || []).length === 3 && /Paso 1/.test(hm) && /Paso 2/.test(hm) && /Paso 3/.test(hm) && /data-route/.test(hm), 'Portada estructurada como ruta de aprendizaje en 3 pasos');
+ok(/Step 1/.test((await anon.get('/en/')).text) && /Passo 1/.test((await anon.get('/pt/')).text), 'Ruta de aprendizaje traducida');
+ok((hm.match(/class="fnum /g) || []).length >= 10 && /aria-hidden="true">/.test(hm), 'Números flotantes decorativos (ocultos a lectores de pantalla)');
+const navOrder = [...hm.matchAll(/<nav id="nav"[\s\S]*?<\/nav>/g)][0][0]; ok(navOrder.indexOf('/preguntas') < navOrder.indexOf('/archivo') && navOrder.indexOf('/archivo') < navOrder.indexOf('/fichas') && navOrder.indexOf('/fichas') < navOrder.indexOf('/aula'), 'Menú ordenado según la ruta: preguntas → archivo → fichas → aula');
+ok(/data-toc/.test(ar) && ['#resumen', '#explorador', '#profundizar', '#ejercicio', '#imagenes', '#consulta'].every((a) => ar.includes(`href="${a}"`) && ar.includes(`id="${a.slice(1)}"`)), 'Archivo con índice lateral cuyos anclajes existen');
+ok(/data-tour-start/.test(ar) && /data-tour-text/.test(ar), 'Explorador con recorrido guiado');
+ok(/data-qz="a"/.test(ar) && (ar.match(/class="qz-item"/g) || []).length === 8 && (ar.match(/data-ok="1"/g) || []).length === 8, 'Ejercicio dato/patrón/interpretación: 8 afirmaciones, una respuesta correcta cada una');
+ok(/data-qz="b"/.test(fq) && (fq.match(/class="qz-item"/g) || []).length === 5 && /Pon a prueba lo aprendido/.test(fq), 'Repaso final de 5 preguntas en las preguntas frecuentes');
+ok(/data-faq-next="2"/.test(fq) && (fq.match(/data-faq-next=/g) || []).length === 5, 'Botón «siguiente pregunta» en cada respuesta');
+ok(/Exercise: data, pattern or interpretation/.test((await anon.get('/en/archivo')).text) && /Exercício: dado, padrão ou interpretação/.test((await anon.get('/pt/archivo')).text), 'Ejercicio traducido a EN y PT');
+ok(/Test what you learned/.test((await anon.get('/en/preguntas')).text) && /Teste o que aprendeu/.test((await anon.get('/pt/preguntas')).text), 'Repaso traducido a EN y PT');
+ok((await anon.get('/js/lab.js')).status === 200 && /data-qz/.test((await anon.get('/js/lab.js')).text), 'Lógica de cuestionarios y recorrido disponible');
+const sv = (await anon.get('/img/lamina-es.svg')).text; ok(sv.includes('class="hl dr"') && sv.includes('PERONÉ') && /M64 170C64 160/.test(sv), 'Plano con el peroné rehecho y resaltado');
 
 console.log(`\n${fail ? '✗' : '✓'} ${pass} pruebas correctas, ${fail} fallidas`); server.close(); process.exit(fail ? 1 : 0);

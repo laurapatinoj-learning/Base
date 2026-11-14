@@ -38,7 +38,8 @@ ${out}</svg>`);
 // Leyenda de la convención de color (común a todo el sitio).
 export const legend = (lang, only) => { const t = tl(lang); return html`<ul class="legend" aria-label="${t('legend.title')}">${['p', 'o', 'e'].filter((k) => !only || only.includes(k)).map((k) => html`<li><i class="sw n-${k}"></i>${t('legend.' + k)}</li>`)}</ul>`; };
 
-const NAV = [['/archivo', 'nav.archive'], ['/preguntas', 'nav.faq'], ['/fichas', 'nav.sheets'], ['/biblioteca', 'nav.library'], ['/catalogo', 'nav.catalog'], ['/aula', 'nav.classroom']];
+// El orden sigue la ruta de aprendizaje: entender → explorar → profundizar.
+const NAV = [['/preguntas', 'nav.faq'], ['/archivo', 'nav.archive'], ['/fichas', 'nav.sheets'], ['/aula', 'nav.classroom'], ['/biblioteca', 'nav.library'], ['/catalogo', 'nav.catalog']];
 
 export function layout(ctx, { title, desc, path, image, jsonld, noindex = false, bodyClass = '', main, hero }) {
   const lang = ctx.lang || 'es'; const t = tl(lang); const u = ctx.user; const base = siteUrl(); const P = langPrefix(lang);
@@ -80,7 +81,7 @@ ${hero || ''}
 <div><h2>${t('foot.newsletter')}</h2><form class="inline-form" data-api="/api/newsletter" data-ok="${t('form.nl_ok')}"><label class="sr" for="fn-email">${t('form.email')}</label><input id="fn-email" name="email" type="email" required placeholder="${t('form.email_ph')}" autocomplete="email"><input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true"><button class="btn sm light">${t('form.subscribe')}</button><p class="form-msg" role="status"></p></form></div>
 </div><div class="wrap legal"><span>© ${new Date().getFullYear()} Base Parkway. ${t('foot.source')}: <a href="https://periodico.unal.edu.co/articulos/el-enigmatico-hueso-de-ishango-secreto-ancestral-de-numeros-primos-gemelos" rel="noopener">Periódico UNAL</a>.</span><a href="#top">${t('foot.top')}</a></div></footer>
 <div class="toast" role="status" aria-live="polite"></div>
-<script src="/js/app.js" defer></script><script src="/js/extra.js" defer></script><script src="/js/motion.js" defer></script></body></html>`;
+<script src="/js/app.js" defer></script><script src="/js/extra.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/lab.js" defer></script></body></html>`;
 }
 
 export const field = (label, name, o = {}) => html`<div class="field"><label for="f-${name}">${label}${o.required ? raw(' <abbr title="*">*</abbr>') : ''}</label>${o.textarea ? html`<textarea id="f-${name}" name="${name}" rows="${o.rows || 5}" ${o.required ? 'required' : ''} ${o.max ? raw(`maxlength="${o.max}"`) : ''}>${o.value || ''}</textarea>` : html`<input id="f-${name}" name="${name}" type="${o.type || 'text'}" value="${o.value || ''}" ${o.required ? 'required' : ''} ${o.auto ? raw(`autocomplete="${o.auto}"`) : ''} ${o.ph ? raw(`placeholder="${esc(o.ph)}"`) : ''} ${o.pattern ? raw(`pattern="${esc(o.pattern)}"`) : ''} ${o.minlength ? raw(`minlength="${o.minlength}"`) : ''} ${o.inputmode ? raw(`inputmode="${o.inputmode}"`) : ''}>`}${o.hint ? html`<small>${o.hint}</small>` : ''}</div>`;

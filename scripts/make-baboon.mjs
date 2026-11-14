@@ -13,10 +13,14 @@ const head = (x, y, dx, dy, delay) => { const r = (a) => [dx * Math.cos(a) - dy 
 const dr = (d, delay, o = {}) => `<path class="dr" pathLength="1" style="--d:${delay}s;--t:${o.t || 2}s" d="${d}"${o.sw ? ` stroke-width="${o.sw}"` : ''}/>`;
 
 // Huesos de la pierna con el peroné resaltado (coordenadas absolutas)
-const leg = `<g transform="translate(655 322)">
-<path class="fd" style="--d:3s" d="M40 -14V262" stroke-dasharray="14 3 2 3" stroke-width="0.8"/>
-<g class="fd" style="--d:3s"><circle cx="40" cy="20" r="12"/><path d="M31 32L30 100M49 32L50 100"/><circle cx="27" cy="112" r="10"/><circle cx="53" cy="112" r="10"/><path d="M0 136H80M14 136L18 238H34M66 136L62 238H46"/></g>
-<path class="hl dr" pathLength="1" style="--d:3.6s;--t:1.2s" d="M86 142C86 134 100 134 100 142L98 238C98 248 88 248 88 238Z" stroke-width="3.4"/></g>`;
+const FEM = 'M30 0C29 38 26 66 18 90C8 106 14 128 32 128C38 128 40 122 40 116C40 122 42 128 48 128C66 128 72 106 62 90C54 66 51 38 50 0';
+const TIB = 'M10 146C10 138 26 134 40 140C54 134 70 138 70 146L67 164C61 178 53 192 51 208L52 288C52 296 57 304 58 316C54 324 44 326 38 322C32 320 30 314 30 306L28 208C26 192 19 178 13 164Z';
+const FIB = 'M64 170C64 160 82 160 84 170C85 176 80 182 72 186C70 230 71 270 70 296C79 300 84 312 78 326C72 332 66 328 65 320C66 302 63 270 62 230C61 210 62 196 64 184Z';
+const leg = `<g transform="translate(640 300)">
+<path class="fd" style="--d:3s" d="M40 -14V342" stroke-dasharray="14 3 2 3" stroke-width="0.8"/>
+${dr(FEM, 3, { t: 1.6 })}${dr(TIB, 3.2, { t: 1.6 })}
+<g class="fd" style="--d:3.6s" stroke-width="0.8" stroke-opacity=".6"><path d="M34 18L46 15M33 40L47 36M32 62L48 58M30 82L46 78M40 160V300" stroke-dasharray="3 3"/><path d="M26 104C32 110 48 110 54 104"/></g>
+<path class="hl dr" pathLength="1" style="--d:3.8s;--t:1.4s" d="${FIB}" stroke-width="3" fill="rgba(255,255,255,.16)"/></g>`;
 
 // Hueso de Ishango vertical con las tres columnas, coloreadas según el número de cada grupo
 const BX = 1040;
@@ -57,9 +61,9 @@ ${ticks}
 <g class="fd" style="--d:4.4s"><text x="${BX - 20}" y="184" class="t sm" text-anchor="middle">G</text><text x="${BX}" y="184" class="t sm" text-anchor="middle">M</text><text x="${BX + 20}" y="184" class="t sm" text-anchor="middle">D</text></g>
 <g class="fd" style="--d:3.6s"><path d="M${BX - 98} 140V664" stroke-width="1.2" marker-start="url(#a)" marker-end="url(#a)"/><path d="M${BX - 108} 140H${BX - 88}M${BX - 108} 664H${BX - 88}" stroke-width="1"/>
 <text class="t" transform="translate(${BX - 112} 402) rotate(-90)" text-anchor="middle">≈ 10 cm <tspan class="sm">${t.len}</tspan></text><text class="t" x="${BX + 62}" y="402">168</text><text class="t sm" x="${BX + 62}" y="420">16 · 3</text></g>
-${dr('M530 590C580 590 620 560 656 526', 3.4, { t: 1.2, sw: 1.3 })}${head(656, 526, 0.727, -0.687, 4.5)}
-${dr('M752 578C800 650 860 668 912 624', 4, { t: 1.6, sw: 1.3 })}${head(912, 624, 0.763, -0.646, 5.5)}
-<g class="fd" style="--d:4s"><text class="t sm" x="772" y="352">${t.fib}</text><path d="M770 356L748 392" stroke-width="0.9"/></g>
+${dr('M530 596C580 596 616 576 644 548', 3.4, { t: 1.2, sw: 1.3 })}${head(644, 548, 0.707, -0.707, 4.5)}
+${dr('M722 640C790 700 860 700 912 660', 4.2, { t: 1.6, sw: 1.3 })}${head(912, 660, 0.793, -0.61, 5.7)}
+<g class="fd" style="--d:4.4s"><text class="t sm" x="772" y="456">${t.fib}</text><path d="M766 460L732 478" stroke-width="0.9"/></g>
 <g class="fd" style="--d:4.6s">${legend}</g></svg>`;
 }
 for (const l of ['es', 'en', 'pt']) writeFileSync(new URL(`../public/img/lamina-${l}.svg`, import.meta.url), plate(l));
