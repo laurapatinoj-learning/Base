@@ -4,10 +4,11 @@ Plataforma editorial y académica: CMS, 5 fichas editoriales, catálogo, agenda,
 
 ```bash
 npm start        # http://localhost:3000  (Node ≥ 22.13, sin dependencias)
-npm test         # 188 pruebas de extremo a extremo
+npm test         # 198 pruebas de extremo a extremo
 npm run build:pdfs   # regenera los PDF (requiere python3 + reportlab)
 npm run build:html   # genera ./html: HTML autónomos en ES, EN y PT
-node scripts/make-poster.mjs   # regenera la lámina técnica del babuino al hueso
+python3 scripts/make-baboon-art.py scripts/src/babuino-blueprint-original.png public/img/babuino-lineas.webp   # ilustración del babuino con fondo transparente
+node scripts/make-baboon.mjs   # regenera el plano «blueprint» animado (ES/EN/PT) en public/img/lamina-*.svg
 ```
 
 **Idiomas:** ES (`/`), EN (`/en`) y PT (`/pt`). Textos de página en `lib/copy-pages.js` y `lib/i18n.js`; traducciones de fichas, productos y eventos en `lib/content-i18n.js`. Las lecciones del aula están solo en español.

@@ -18,9 +18,8 @@ const mime = { jpg: 'image/jpeg', svg: 'image/svg+xml', pdf: 'application/pdf' }
 const cache = new Map(); const uri = (p) => { if (!cache.has(p)) cache.set(p, b64(rd('public' + p.replace(/^\/recursos/, '')), mime[p.split('.').pop()])); return cache.get(p); };
 
 const css = rd('public/css/app.css').toString() + '\n' + rd('public/css/extra.css').toString();
-const js = (rd('public/js/app.js').toString() + '\n' + rd('public/js/extra.js').toString()).replace(/<\/script>/g, '<\\/script>');
+const js = ['app', 'extra', 'motion'].map((n) => rd(`public/js/${n}.js`).toString()).join('\n').replace(/<\/script>/g, '<\\/script>');
 const pdf = b64(rd('storage/resources/hoja-de-trabajo-ishango.pdf'), 'application/pdf');
-const poster = b64(rd('public/img/poster-ishango.svg'), 'image/svg+xml');
 
 const events = all('SELECT slug FROM events WHERE published=1');
 const lessons = all('SELECT l.id, c.slug FROM lessons l JOIN modules m ON m.id=l.module_id JOIN courses c ON c.id=m.course_id').map((l) => `/aula/${l.slug}/leccion/${l.id}`);
@@ -45,12 +44,12 @@ function transform(h, path) {
   h = h.replace(/ data-add-cart="\d+"/g, '')
     .replace(/<link rel="canonical"[^>]*>/, '').replace(/<link rel="alternate" hreflang[^>]*>/g, '').replace(/<meta property="og:url"[^>]*>/, '')
     .replace('<link rel="stylesheet" href="/css/app.css"><link rel="stylesheet" href="/css/extra.css">', () => `<style>${css}</style>`)
-    .replace('<script src="/js/app.js" defer></script><script src="/js/extra.js" defer></script>', () => `<script>${js}</script>`)
+    .replace('<script src="/js/app.js" defer></script><script src="/js/extra.js" defer></script><script src="/js/motion.js" defer></script>', () => `<script>${js}</script>`)
     .replace(/src="(\/img\/[^"]+\.jpg)"/g, (m, p) => `src="${uri(p)}"`);
   return h.replace(/href="(\/[^"]*)"/g, (m, u) => {
     const [pp, hash] = u.split('#'); const clean = pp.split('?')[0].replace(/\/$/, '') || '/';
     if (clean === '/img/logo.svg') return `href="${uri('/img/logo.svg')}"`;
-    if (clean === '/img/poster-ishango.svg') return `href="${poster}" download="poster-ishango.svg"`;
+    const lam = /^\/img\/lamina-(es|en|pt)\.svg$/.exec(clean); if (lam) return `href="${uri(clean)}" download="lamina-ishango-${lam[1]}.svg"`;
     if (clean === '/recursos/hoja-de-trabajo-ishango.pdf') return `href="${pdf}" download="hoja-de-trabajo-ishango.pdf"`;
     const ic = /^\/agenda\/([\w-]+)\.ics$/.exec(clean); if (ic) return `href="${ics[ic[1]]}" download="${ic[1]}.ics"`;
     const lm = /^\/(en|pt)(\/.*)?$/.exec(clean); const lang = lm ? lm[1] : 'es'; const p = lm ? (lm[2] || '/') : clean;

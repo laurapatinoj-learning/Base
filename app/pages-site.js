@@ -9,7 +9,7 @@ import { TR, UNAL_CAPTIONS, UNAL_ALT, LIBRARY } from '../lib/content-i18n.js';
 import { layout, field, crumbs, pageHead, cover, boneSvg, logoMark, siteUrl, SITE_NAME, STATIC, legend, numType } from './layout.js';
 
 const UNAL = Object.fromEntries(JSON.parse(readFileSync(new URL('../lib/unal-images.json', import.meta.url), 'utf8')).map((m) => [m.file, m]));
-const POSTER = (() => { try { return readFileSync(new URL('../public/img/poster-ishango.svg', import.meta.url), 'utf8').replace(/<\?xml[^>]*>/, ''); } catch { return ''; } })();
+const POSTER = Object.fromEntries(['es', 'en', 'pt'].map((l) => { try { return [l, readFileSync(new URL(`../public/img/lamina-${l}.svg`, import.meta.url), 'utf8').replace(/<\?xml[^>]*>/, '')]; } catch { return [l, '']; } }));
 const s = (lang, es, en, pt) => ({ es, en, pt }[lang] ?? es);
 const H = (t) => (k) => raw(t(k));
 const loc = (kind, row, lang) => (lang === 'es' || !row ? row : { ...row, ...(TR[kind]?.[row.slug]?.[lang] || {}) });
@@ -76,7 +76,7 @@ const explorerRow = (col, lang) => { const t = tl(lang); return html`<div class=
 export function archivo(ctx) {
   const lang = ctx.lang || 'es', t = tl(lang), h = H(t);
   const fichas = all('SELECT slug,title,kind FROM fichas WHERE published=1 ORDER BY ord').map((f) => loc('fichas', f, lang));
-  const prof = getBlock('profesor-resumen', lang);
+  const prof = getBlock('profesor-resumen', lang); const nn = (k) => t(k).replace(/^\d+\.\s*/, '');
   const main = html`<article class="wrap article">
 ${crumbs([[null, t('nav.archive')]], lang)}
 <header class="article-head"><p class="kicker">${t('arc.kicker')}</p><h1>${t('arc.h1')}</h1>
@@ -87,24 +87,25 @@ ${fig('unal-1.jpg', lang, 'wide')}
 <!-- RESUMEN DEL PROFESOR (mismo bloque editable de la portada) -->
 <aside class="prof-card"><p class="kicker">${t('home.prof.kicker')}</p><div class="prose" data-block="profesor-resumen">${prof ? md(prof.body) : ''}</div><p><a class="more" href="/autor">${t('home.prof.more')} →</a></p></aside>
 
-<h2>${t('arc.h2a')}</h2><p>${h('arc.p2a')}</p><p>${h('arc.p2b')}</p>
-<h2>${t('arc.h2b')}</h2><p>${h('arc.p3')}</p>
-<h2 id="explorador">${t('arc.h2c')}</h2><p>${t('arc.p4')}</p>
+<h2>${nn('arc.h2a')}</h2><p>${h('arc.p2a')}</p><p>${h('arc.p2b')}</p>
+<h2 id="explorador">${nn('arc.h2c')}</h2><p>${t('arc.p4')}</p>
 <div class="explorer" data-explorer>${legend(lang)}
 <div class="ex-controls" role="group" aria-label="${t('ex.cols')}"><button class="chip" aria-pressed="false" data-toggle="twins">${t('ex.twins')}</button><button class="chip" aria-pressed="false" data-toggle="sums">${t('ex.sums')}</button></div>
 ${['G', 'M', 'D'].map((c) => explorerRow(c, lang))}
 <p class="ex-readout" data-readout role="status" aria-live="polite">${t('ex.readout')}</p>
 <dl class="ex-stats"><div><dt>${t('ex.marks')}</dt><dd>168</dd></div><div><dt>${t('ex.groups')}</dt><dd>16</dd></div><div><dt>${t('ex.primes')}</dt><dd data-stat="primes">—</dd></div><div><dt>${t('ex.pairs')}</dt><dd data-stat="twins">—</dd></div></dl></div>
 ${fig('unal-5.jpg', lang, 'tall')}
-<h2>${t('arc.h2d')}</h2><p>${h('arc.p5')}</p>
-<h2 id="empedocles">${t('arc.h2e')}</h2><p>${h('arc.p6')}</p>
+<p class="kicker deep">${t('arc.deep')}</p>
+<details class="fold"><summary>${nn('arc.h2b')}</summary><p>${h('arc.p3')}</p></details>
+<details class="fold"><summary>${nn('arc.h2d')}</summary><p>${h('arc.p5')}</p></details>
+<details class="fold" id="empedocles"><summary>${nn('arc.h2e')}</summary><p>${h('arc.p6')}</p>
 <div class="emp" data-emp><h3 class="emp-title">${t('emp.title')}</h3>
 <div class="ex-controls" role="group" aria-label="${t('ex.cols')}"><button class="chip" aria-pressed="false" data-emp-toggle="sextet">${t('emp.t.sextet')}</button><button class="chip" aria-pressed="false" data-emp-toggle="ne">${t('emp.t.ne')}</button><button class="chip" aria-pressed="false" data-emp-toggle="sym">${t('emp.t.sym')}</button><button class="chip" aria-pressed="false" data-emp-toggle="pairs">${t('emp.t.pairs')}</button></div>
 ${empChart(lang)}${legend(lang, ['p', 'o'])}<p class="ex-readout light" data-emp-readout role="status" aria-live="polite">${t('emp.hint')}</p></div>
-${fig('unal-4.jpg', lang, 'wide')}
-<h2>${t('arc.h2f')}</h2><p>${h('arc.p7')}</p><blockquote>${t('arc.quote')}</blockquote>
-<h2>${t('arc.h2g')}</h2><p>${t('arc.p8')}</p>
-<section class="gallery-sec"><h2>${t('arc.photos.h')}</h2><p class="muted">${t('arc.photos.p')}</p><div class="gallery">${['unal-8.jpg', 'unal-2.jpg', 'unal-3.jpg'].map((f) => fig(f, lang))}</div></section>
+${fig('unal-4.jpg', lang, 'wide')}</details>
+<details class="fold"><summary>${nn('arc.h2f')}</summary><p>${h('arc.p7')}</p><blockquote>${t('arc.quote')}</blockquote></details>
+<details class="fold"><summary>${nn('arc.h2g')}</summary><p>${t('arc.p8')}</p></details>
+<details class="fold"><summary>${t('arc.photos.h')}</summary><p class="muted">${t('arc.photos.p')}</p><div class="gallery">${['unal-8.jpg', 'unal-2.jpg', 'unal-3.jpg'].map((f) => fig(f, lang))}</div></details>
 <section class="band-inline consult"><h2>${t('arc.consult.h')}</h2><p>${t('arc.consult.p')}</p><p><a class="btn" href="/biblioteca#consulta">${t('arc.consult.btn')}</a></p></section>
 <section class="band-inline"><h2>${t('arc.more.h')}</h2><ul class="plain cols">${fichas.map((f) => html`<li><a href="/fichas/${f.slug}"><small>${kindLabel(f.kind, lang)}</small><br>${f.title}</a></li>`)}</ul><p><a class="btn" href="/preguntas">${t('arc.faq')}</a> <a class="btn ghost" href="/aula">${t('arc.class')}</a>${STATIC ? '' : html` <a class="btn ghost" href="/catalogo/dossier-ishango-pdf">${t('arc.dl')}</a>`}</p></section>
 <section class="cite"><h2>${t('arc.cite.h')}</h2><p>${SRC}</p><p><a href="${SRC_URL}" rel="noopener">${SRC_URL}</a></p><p class="muted">${t('arc.cite.img')}</p></section>
@@ -137,13 +138,13 @@ export function preguntas(ctx) {
   const lang = ctx.lang || 'es', t = tl(lang), h = H(t);
   const tr = (k) => JSON.stringify([1, 2, 3, 4, 5].map((i) => [t('tl.m' + i), t('tl.y' + i), t('tl.d' + i)]));
   const nums = Array.from({ length: 40 }, (_, i) => i + 1);
-  const Q = (n, body) => html`<section class="faq-item reveal" id="q${n}" aria-labelledby="q${n}-h"><h2 id="q${n}-h">${t(`q${n}.q`)}</h2>${body}</section>`;
+  const Q = (n, body) => html`<details class="faq-item" id="q${n}" name="faq" ${n === 1 ? 'open' : ''}><summary><span class="qn" aria-hidden="true">${n}</span><h2 id="q${n}-h">${t(`q${n}.q`).replace(/^\d\.\s*/, '')}</h2></summary><div class="faq-body">${body}</div></details>`;
   const main = html`<div class="wrap article faq">
 ${crumbs([[null, t('nav.faq')]], lang)}
 <nav class="faq-index" aria-label="${t('faq.index')}">${[1, 2, 3, 4, 5].map((n) => html`<a href="#q${n}"><b>${n}</b><span>${t(`q${n}.q`).replace(/^\d\.\s*/, '')}</span></a>`)}</nav>
 ${Q(1, html`${h('q1.a')}<div class="timeline" data-timeline data-tl='${tr()}'><div class="track"><i></i></div>${tlMarks.map(([yrs, i]) => html`<button type="button" class="tl-m" style="left:${100 - (yrs / 20000) * 100}%" data-i="${i}" aria-label="${t('tl.m' + i)} — ${t('tl.y' + i)}"><span class="dot"></span><span class="nm">${t('tl.m' + i)}</span></button>`)}</div><p class="tl-detail" data-tl-detail role="status" aria-live="polite">${t('tl.hint')}</p><p class="small muted">${t('tl.note')}</p>`)}
 ${Q(2, html`${h('q2.a')}<figure class="map" data-map><div class="map-box">${mapSvg(lang)}</div><div class="map-ctl"><button type="button" class="btn sm" data-map-zoom="in">${t('map.zoomin')}</button><button type="button" class="btn sm ghost" data-map-zoom="out">${t('map.zoomout')}</button><a class="btn sm ghost" href="https://www.openstreetmap.org/?mlat=-0.14&mlon=29.59#map=9/-0.14/29.59" rel="noopener" target="_blank">${t('map.real')}</a></div><figcaption>${t('map.hint')} ${t('map.note')}</figcaption></figure>${fig('unal-2.jpg', lang)}`)}
-${Q(3, html`${h('q3.a')}<figure class="poster"><div class="poster-art" role="img" aria-label="${t('poster.alt')}">${raw(POSTER)}</div><figcaption>${t('poster.cap')} <a href="/img/poster-ishango.svg" download>${t('poster.dl')}</a></figcaption></figure><div class="gallery two">${fig('unal-8.jpg', lang)}${fig('unal-3.jpg', lang)}</div>`)}
+${Q(3, html`${h('q3.a')}<figure class="poster"><div class="poster-art" data-draw role="img" aria-label="${t('poster.alt')}">${raw(POSTER[lang] || POSTER.es)}</div><figcaption>${t('poster.cap')} <a href="/img/lamina-${lang}.svg" download>${t('poster.dl')}</a></figcaption></figure><div class="gallery two">${fig('unal-8.jpg', lang)}${fig('unal-3.jpg', lang)}</div>`)}
 ${Q(4, html`${h('q4.a')}<div class="notch" data-notch><h3>${t('notch.title')}</h3><div class="notch-bone" aria-hidden="true"><div class="marks" data-marks></div></div><div class="row"><button type="button" class="btn sm" data-notch-add>${t('notch.add')}</button><button type="button" class="btn sm ghost" data-notch-sub>${t('notch.sub')}</button><button type="button" class="btn sm ghost" data-notch-reset>${t('notch.reset')}</button></div><p class="ex-readout light" data-notch-readout role="status" aria-live="polite">${t('notch.zero')}</p>${legend(lang)}</div>${fig('unal-1.jpg', lang)}`)}
 ${Q(5, html`<div class="faq-cols"><div><h3>${t('q5.prime.h')}</h3>${h('q5.prime.p')}</div><div><h3>${t('q5.twin.h')}</h3>${h('q5.twin.p')}</div></div>
 <div class="numgrid" data-numgrid><h3>${t('grid.title')}</h3><div class="ng">${nums.map((n) => html`<button type="button" class="n-${numType(n)}" data-n="${n}">${n}</button>`)}</div>${legend(lang)}<p class="ex-readout light" data-grid-readout role="status" aria-live="polite">${t('grid.hint')}</p></div>

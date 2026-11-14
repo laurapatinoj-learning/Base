@@ -166,7 +166,7 @@ ok((await anon.get('/pt/catalogo')).text.includes('Dossiê Ishango'), 'Catálogo
 const faq = es.text;
 ok([1, 2, 3, 4, 5].every((n) => faq.includes(`id="q${n}"`)) && /¿Cuándo sucedió\?/.test(faq) && /¿Dónde sucedió\?/.test(faq) && /¿Qué es una muesca\?/.test(faq), 'Preguntas frecuentes: las 5 preguntas');
 ok(/data-timeline/.test(faq) && /data-map/.test(faq) && /data-notch/.test(faq) && /data-numgrid/.test(faq), 'FAQ con línea de tiempo, mapa, tallado y cuadrícula interactivos');
-ok(/poster-art/.test(faq) && faq.includes('Papio') && (await anon.get('/img/poster-ishango.svg')).status === 200, 'Lámina técnica del babuino al hueso');
+ok(/poster-art/.test(faq) && faq.includes('Papio') && (await anon.get('/img/lamina-es.svg')).status === 200, 'Lámina técnica del babuino al hueso');
 ok(/peroné/.test(faq) && /Congo/.test(faq) && /Uganda/.test(faq) && /No fue en Grecia ni en Europa/.test(faq), 'Respuestas: peroné, Congo/Uganda y mirada no eurocéntrica');
 const arc2 = (await anon.get('/archivo')).text;
 for (const f of ['unal-1', 'unal-2', 'unal-3', 'unal-4', 'unal-5', 'unal-8']) ok(arc2.includes(`/img/unal/${f}.jpg`) && (await anon.get(`/img/unal/${f}.jpg`)).status === 200, `Imagen del Periódico UNAL preservada: ${f}.jpg`);
@@ -188,5 +188,16 @@ ok((await anon.get('/en/')).text.includes('Doctor en Derecho') === false && (awa
 ok((await nuevo.put(`/api/admin/r/blocks/${br.id}`, { body: 'x' })).status === 403, 'Solo el personal edita el resumen');
 const sm3 = (await anon.get('/sitemap.xml')).text; ok(/\/en\/preguntas/.test(sm3) && /\/pt\/biblioteca/.test(sm3) && /hreflang="pt"/.test(sm3), 'Sitemap con las tres versiones de idioma');
 ok((await anon.get('/en/no-existe')).status === 404 && /We could not find that page/.test((await anon.get('/en/no-existe')).text), '404 en el idioma de la ruta');
+
+section('9. Experiencia para todo público: acordeón, plano animado con el babuino y movimiento');
+const fq = (await anon.get('/preguntas')).text;
+ok((fq.match(/<details class="faq-item"/g) || []).length === 5 && /name="faq"/.test(fq) && (fq.match(/<details class="faq-item"[^>]* open>/g) || []).length === 1, 'Preguntas como acordeón exclusivo: 5 preguntas y solo la primera abierta');
+ok(/data-draw/.test(fq) && /class="baboon"/.test(fq) && /data:image\/webp;base64,/.test(fq) && /class="dr"/.test(fq), 'Plano con la ilustración del babuino y líneas animables');
+for (const [l, title] of [['es', 'BABUINO'], ['en', 'BABOON'], ['pt', 'BABUÍNO']]) { const sv = await anon.get(`/img/lamina-${l}.svg`); ok(sv.status === 200 && sv.text.includes(title) && sv.text.includes('Papio sp.') && (sv.text.match(/class="fu"/g) || []).length >= 168, `Lámina descargable (${l.toUpperCase()}) con título, especie y las 168 marcas`); }
+ok((await anon.get('/img/babuino-lineas.webp')).status === 200, 'Ilustración del babuino disponible');
+ok(/Para profundizar/.test((await anon.get('/archivo')).text) && ((await anon.get('/archivo')).text.match(/<details class="fold"/g) || []).length === 6, 'Archivo con 6 apartados plegables bajo «Para profundizar»');
+ok(/Go deeper/.test((await anon.get('/en/archivo')).text) && /Aprofundar/.test((await anon.get('/pt/archivo')).text), 'Apartados plegables traducidos');
+ok((await anon.get('/js/motion.js')).status === 200 && /read-progress/.test((await anon.get('/js/motion.js')).text) && /view-transition/.test((await anon.get('/css/extra.css')).text), 'Barra de progreso de lectura y transiciones entre páginas');
+ok(/prefers-reduced-motion/.test((await anon.get('/css/extra.css')).text), 'El movimiento respeta «reducir movimiento»');
 
 console.log(`\n${fail ? '✗' : '✓'} ${pass} pruebas correctas, ${fail} fallidas`); server.close(); process.exit(fail ? 1 : 0);
