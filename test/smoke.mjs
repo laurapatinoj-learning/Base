@@ -150,4 +150,43 @@ ok(an.events.add_to_cart >= 3 && an.events.purchase >= 2 && an.events.signup >= 
 ok(an.funnel.length === 4 && an.kpis.orders_paid >= 1 && an.kpis.revenue === 0 && an.funnel[3][1] >= 2, 'Embudo calculado; ingresos excluyen pedidos cancelados');
 ok((await admin.get('/api/admin/users')).json.rows.length >= 5 && (await nuevo.get('/api/admin/users')).status === 403, 'Gestión de usuarios solo para administración');
 
+section('8. Multilingüe (ES/EN/PT), preguntas frecuentes, resumen del profesor e imágenes UNAL');
+const newPages = ['/preguntas', '/biblioteca', '/autor'];
+for (const l of ['', '/en', '/pt']) for (const p of ['/', '/archivo', ...newPages, '/fichas', '/fichas/primos-gemelos-en-el-hueso', '/catalogo', '/agenda', '/aula', '/aula/ishango-numeros-primos', '/contacto', '/newsletter']) {
+  const r = await anon.get(l + (p === '/' && l ? '' : p) || '/'); ok(r.status === 200 && /<h1/.test(r.text), `GET ${l || '/es'}${p === '/' ? '' : p} → 200`, r.status);
+}
+const en = await anon.get('/en/archivo'), pt = await anon.get('/pt/preguntas'), es = await anon.get('/preguntas');
+ok(/<html lang="en"/.test(en.text) && /The enigmatic Ishango bone/.test(en.text), 'Versión EN con <html lang="en"> y contenido en inglés');
+ok(/<html lang="pt"/.test(pt.text) && /Perguntas frequentes/.test(pt.text), 'Versión PT con <html lang="pt"> y contenido en portugués');
+ok(/hreflang="en"/.test(es.text) && /hreflang="pt"/.test(es.text) && /hreflang="es"/.test(es.text), 'hreflang para los tres idiomas');
+ok(/href="\/en\/fichas"/.test(en.text) && !/href="\/fichas"/.test(en.text.replace(/hreflang[^>]*>/g, '')), 'Los enlaces internos de la versión EN conservan el idioma');
+ok(/class="lang"/.test(es.text) && /\/pt\/preguntas/.test(es.text), 'Selector de idioma enlaza a la misma página en otro idioma');
+ok((await anon.get('/en/fichas/primos-gemelos-en-el-hueso')).text.includes('Twin primes on the bone'), 'Fichas traducidas (EN)');
+ok((await anon.get('/pt/catalogo')).text.includes('Dossiê Ishango'), 'Catálogo traducido (PT)');
+const faq = es.text;
+ok([1, 2, 3, 4, 5].every((n) => faq.includes(`id="q${n}"`)) && /¿Cuándo sucedió\?/.test(faq) && /¿Dónde sucedió\?/.test(faq) && /¿Qué es una muesca\?/.test(faq), 'Preguntas frecuentes: las 5 preguntas');
+ok(/data-timeline/.test(faq) && /data-map/.test(faq) && /data-notch/.test(faq) && /data-numgrid/.test(faq), 'FAQ con línea de tiempo, mapa, tallado y cuadrícula interactivos');
+ok(/poster-art/.test(faq) && faq.includes('Papio') && (await anon.get('/img/poster-ishango.svg')).status === 200, 'Lámina técnica del babuino al hueso');
+ok(/peroné/.test(faq) && /Congo/.test(faq) && /Uganda/.test(faq) && /No fue en Grecia ni en Europa/.test(faq), 'Respuestas: peroné, Congo/Uganda y mirada no eurocéntrica');
+const arc2 = (await anon.get('/archivo')).text;
+for (const f of ['unal-1', 'unal-2', 'unal-3', 'unal-4', 'unal-5', 'unal-8']) ok(arc2.includes(`/img/unal/${f}.jpg`) && (await anon.get(`/img/unal/${f}.jpg`)).status === 200, `Imagen del Periódico UNAL preservada: ${f}.jpg`);
+ok(/Royal Belgian Institute of Natural Sciences/.test(arc2) && /Christof Stache \/ AFP/.test(arc2), 'Se conservan los créditos de las fotografías');
+ok(/data-emp/.test(arc2) && (arc2.match(/class="pt n-/g) || []).length === 12, 'Gráfico interactivo del 60 n(i): 12 puntos (6 por sección)');
+ok(/class="grp n-p"/.test(arc2) && /class="grp n-o"/.test(arc2) && /class="grp n-e"/.test(arc2), 'Convención de color: primos (rojo), compuestos impares (verde) y pares (negro)');
+ok(/legend/.test(arc2) && /Compuesto impar/.test(arc2), 'Leyenda de la convención visible');
+ok(/data-block="profesor-resumen"/.test((await anon.get('/')).text) && /Doctor en Derecho/.test((await anon.get('/')).text), 'Resumen del profesor en la portada');
+ok(/Doctor en Derecho/.test(arc2) && /Fin de la soledad de los números primos/.test(arc2), 'Resumen del profesor también en el archivo');
+const aut = (await anon.get('/autor')).text; ok(/Logos del Segundo Bastón de Ishango/.test(aut) && /ISBN 978-628-95692-4-7/.test(aut) && /ISBN 978-628-7626-71-3/.test(aut), 'Página del autor con la obra en curso y las referencias con ISBN');
+ok(/doctorate in law/.test((await anon.get('/en/autor')).text) && /Doutor em Direito/.test((await anon.get('/pt/autor')).text), 'Perfil del autor en EN y PT');
+const lib = (await anon.get('/biblioteca')).text; ok(/Biblioteca Ishango/.test(lib) && /id="consulta"/.test(lib) && /Sistema Ishango/.test(lib), 'Biblioteca Ishango con vínculo de consultas');
+ok((await anon.post('/api/contact', { name: 'Lectora', email: 'l@x.co', subject: 'Consulta sobre el artículo (Biblioteca Ishango)', body: '¿Dónde está el dato de 62 %?' })).status === 200 && (await admin.get('/api/admin/messages')).json.rows.some((m) => m.subject.includes('Consulta sobre el artículo')), 'Consultas sobre el artículo llegan al CMS');
+// El resumen del profesor se edita desde el CMS y se refleja en la portada
+const blocks = (await admin.get('/api/admin/r/blocks')).json.rows; const br = blocks.find((b) => b.key === 'profesor-resumen');
+ok(!!br && blocks.length === 2, 'CMS: bloques editables del profesor (resumen y perfil completo)');
+ok((await admin.put(`/api/admin/r/blocks/${br.id}`, { body: 'Resumen **actualizado** desde el CMS.' })).status === 200 && (await anon.get('/')).text.includes('<strong>actualizado</strong>'), 'Editar el resumen del profesor en el CMS actualiza la portada');
+ok((await anon.get('/en/')).text.includes('Doctor en Derecho') === false && (await anon.get('/en')).text.includes('doctorate in law'), 'El resumen en EN es independiente del texto en ES');
+ok((await nuevo.put(`/api/admin/r/blocks/${br.id}`, { body: 'x' })).status === 403, 'Solo el personal edita el resumen');
+const sm3 = (await anon.get('/sitemap.xml')).text; ok(/\/en\/preguntas/.test(sm3) && /\/pt\/biblioteca/.test(sm3) && /hreflang="pt"/.test(sm3), 'Sitemap con las tres versiones de idioma');
+ok((await anon.get('/en/no-existe')).status === 404 && /We could not find that page/.test((await anon.get('/en/no-existe')).text), '404 en el idioma de la ruta');
+
 console.log(`\n${fail ? '✗' : '✓'} ${pass} pruebas correctas, ${fail} fallidas`); server.close(); process.exit(fail ? 1 : 0);

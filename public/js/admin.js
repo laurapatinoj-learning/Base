@@ -11,7 +11,7 @@
   let schema = {}, view = 'dashboard'; const refCache = {};
   const main = h('main', { class: 'ad-main', tabindex: '-1', id: 'ad-main' });
 
-  const GROUPS = [['Resumen', [['dashboard', 'Analítica']]], ['Contenido', [['fichas'], ['products'], ['events']]], ['Aula', [['courses'], ['modules'], ['lessons'], ['resources'], ['students', 'Estudiantes y avance']]], ['Tienda', [['orders', 'Pedidos'], ['stock', 'Inventario']]], ['Comunidad', [['campaigns'], ['subscribers', 'Suscriptores'], ['messages', 'Mensajes de contacto'], ['registrations', 'Inscripciones a eventos']]], ['Sistema', [['outbox', 'Correos enviados'], ...(ROLE === 'admin' ? [['users', 'Usuarios y roles']] : [])]]];
+  const GROUPS = [['Resumen', [['dashboard', 'Analítica']]], ['Contenido', [['blocks'], ['fichas'], ['products'], ['events']]], ['Aula', [['courses'], ['modules'], ['lessons'], ['resources'], ['students', 'Estudiantes y avance']]], ['Tienda', [['orders', 'Pedidos'], ['stock', 'Inventario']]], ['Comunidad', [['campaigns'], ['subscribers', 'Suscriptores'], ['messages', 'Mensajes de contacto'], ['registrations', 'Inscripciones a eventos']]], ['Sistema', [['outbox', 'Correos enviados'], ...(ROLE === 'admin' ? [['users', 'Usuarios y roles']] : [])]]];
   const nav = h('aside', { class: 'ad-side' });
   function drawNav() { nav.replaceChildren(h('div', { class: 'brand' }, h('b', { style: 'font:800 1.2rem var(--ui)' }, 'BASE '), h('span', { style: 'font:600 .8rem var(--ui)' }, 'Parkway · CMS')), h('small', {}, `${root.dataset.name} · ${ROLE}`),
     ...GROUPS.flatMap(([g, items]) => [h('h2', {}, g), ...items.map(([k, label]) => h('button', { class: 'tab', 'aria-current': view === k, onclick: () => go(k) }, label || schema[k]?.label || k))]), h('a', { href: '/' }, '← Ver el sitio')); }

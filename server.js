@@ -11,9 +11,19 @@ import { seedIfEmpty } from './lib/seed.js';
 import { routes, HttpError, trackEvent } from './app/api.js';
 import './app/admin-api.js';
 import * as P from './app/pages-public.js';
+import * as W from './app/pages-site.js';
 import * as S from './app/pages-shop.js';
 import * as A from './app/pages-aula.js';
-import { layout, siteUrl } from './app/layout.js';
+import { layout, siteUrl, langPrefix } from './app/layout.js';
+import { ensureBlocks } from './lib/seed.js';
+import { LANGS } from './lib/i18n.js';
+
+// Prefija con /en o /pt los enlaces internos de páginas (los recursos y la API no se tocan).
+const NO_PREFIX = /^\/(css|js|img|api|descargas|recursos|admin|ayuda|healthz|sitemap|robots|favicon|en\/|pt\/|en$|pt$)/;
+function localize(h, lang) {
+  if (lang === 'es') return h;
+  return h.replace(/<a\b([^>]*)>/g, (m, attrs) => (/hreflang=/.test(attrs) ? m : m.replace(/href="(\/[^"]*)"/, (mm, u) => (NO_PREFIX.test(u) || /\.ics(\?|$)/.test(u) ? mm : `href="/${lang}${u === '/' ? '' : u}"`))));
+}
 
 const ROOT = new URL('.', import.meta.url).pathname;
 const PUB = join(ROOT, 'public'), DL = join(ROOT, 'storage/downloads'), RES = join(ROOT, 'storage/resources');
@@ -21,12 +31,13 @@ const MIME = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=u
 
 const pages = [];
 const page = (path, fn, opts = {}) => pages.push([new RegExp('^' + path.replace(/:(\w+)/g, '(?<$1>[^/]+)') + '$'), fn, opts]);
-page('/', P.home); page('/archivo', P.archivo); page('/fichas', P.fichasIndex); page('/fichas/:slug', P.fichaDetail);
-page('/catalogo', P.catalogo); page('/catalogo/:slug', P.producto); page('/agenda', P.agenda); page('/agenda/:slug', P.evento);
-page('/newsletter', (c) => P.newsletter(c)); page('/contacto', P.contacto); page('/ayuda', P.ayuda); page('/privacidad', P.privacidad);
+page('/', W.home); page('/archivo', W.archivo); page('/preguntas', W.preguntas); page('/biblioteca', W.biblioteca); page('/autor', W.autor);
+page('/fichas', W.fichasIndex); page('/fichas/:slug', W.fichaDetail);
+page('/catalogo', W.catalogo); page('/catalogo/:slug', W.producto); page('/agenda', W.agenda); page('/agenda/:slug', W.evento);
+page('/newsletter', W.newsletter); page('/contacto', W.contacto); page('/ayuda', P.ayuda); page('/privacidad', W.privacidad);
 page('/carrito', S.carrito); page('/checkout', S.checkout); page('/pedidos', S.pedidos); page('/pedidos/:code', S.pedido);
 page('/ingresar', S.ingresar); page('/registro', S.registro);
-page('/aula', A.aula); page('/aula/:slug', A.curso); page('/aula/:slug/leccion/:id', A.leccion);
+page('/aula', W.aula); page('/aula/:slug', W.curso); page('/aula/:slug/leccion/:id', A.leccion);
 page('/newsletter/confirmar', (ctx) => {
   const s = get('SELECT * FROM subscribers WHERE token=?', ctx.query.get('token') || ''); if (!s) return P.newsletterMsg(ctx, 'El enlace no es válido o ya expiró.', 'Enlace inválido');
   if (s.status !== 'active') { run("UPDATE subscribers SET status='active', confirmed_at=? WHERE id=?", nowIso(), s.id); const [sub, body] = mails.welcomeNews(s.token); sendMail(s.email, sub, body, 'newsletter-bienvenida'); trackEvent(ctx, 'newsletter_confirm'); }
@@ -68,12 +79,14 @@ const server = createServer(async (req, res) => {
   const json = (status, obj) => send(status, 'application/json; charset=utf-8', JSON.stringify(obj), { 'Cache-Control': 'no-store' });
 
   try {
-    const path = decodeURIComponent(url.pathname).replace(/\/+$/, '') || '/';
+    let path = decodeURIComponent(url.pathname).replace(/\/+$/, '') || '/';
+    const lm = /^\/(en|pt)(\/.*)?$/.exec(path); ctx.lang = lm ? lm[1] : 'es'; if (lm) path = lm[2] || '/'; ctx.basePath = path;
     if (path === '/healthz') return json(200, { ok: true });
     if (path === '/robots.txt') return send(200, 'text/plain; charset=utf-8', `User-agent: *\nDisallow: /admin\nDisallow: /api/\nDisallow: /carrito\nDisallow: /checkout\nDisallow: /pedidos\nDisallow: /aula/\nAllow: /\nSitemap: ${siteUrl()}/sitemap.xml\n`);
     if (path === '/sitemap.xml') {
-      const u = ['/', '/archivo', '/fichas', '/catalogo', '/agenda', '/aula', '/newsletter', '/contacto', '/ayuda', ...all('SELECT slug FROM fichas WHERE published=1').map((x) => `/fichas/${x.slug}`), ...all('SELECT slug FROM products WHERE published=1').map((x) => `/catalogo/${x.slug}`), ...all('SELECT slug FROM events WHERE published=1').map((x) => `/agenda/${x.slug}`), ...all('SELECT slug FROM courses WHERE published=1').map((x) => `/aula/${x.slug}`)];
-      return send(200, 'application/xml; charset=utf-8', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${u.map((p) => `<url><loc>${esc(siteUrl() + p)}</loc></url>`).join('')}</urlset>`);
+      const u = ['/', '/archivo', '/preguntas', '/biblioteca', '/autor', '/fichas', '/catalogo', '/agenda', '/aula', '/newsletter', '/contacto', ...all('SELECT slug FROM fichas WHERE published=1').map((x) => `/fichas/${x.slug}`), ...all('SELECT slug FROM products WHERE published=1').map((x) => `/catalogo/${x.slug}`), ...all('SELECT slug FROM events WHERE published=1').map((x) => `/agenda/${x.slug}`), ...all('SELECT slug FROM courses WHERE published=1').map((x) => `/aula/${x.slug}`)];
+      const loc = (l, p) => esc(siteUrl() + langPrefix(l) + (p === '/' ? (l === 'es' ? '' : '') : p));
+      return send(200, 'application/xml; charset=utf-8', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">${LANGS.flatMap((l) => u.map((p) => `<url><loc>${loc(l, p)}</loc>${LANGS.map((a) => `<xhtml:link rel="alternate" hreflang="${a}" href="${loc(a, p)}"/>`).join('')}</url>`)).join('')}</urlset>`);
     }
 
     // API
@@ -118,12 +131,12 @@ const server = createServer(async (req, res) => {
     for (const [re, fn] of pages) {
       const mt = re.exec(path); if (!mt) continue; ctx.params = mt.groups || {}; ctx.cartCount = S.cartCountOf(ctx.cartKey);
       let r = await fn(ctx); if (r == null) break;
-      if (r.redirect) return send(302, 'text/plain', '', { Location: r.redirect });
-      const status = r.status || 200; const body = String(r.body ?? r);
+      if (r.redirect) return send(302, 'text/plain', '', { Location: langPrefix(ctx.lang) + r.redirect });
+      const status = r.status || 200; const body = localize(String(r.body ?? r), ctx.lang);
       if (status === 200 && !path.startsWith('/admin') && !BOT.test(req.headers['user-agent'] || '') && method === 'GET') { try { run('INSERT INTO hits(ts,sid,user_id,path,ref) VALUES(?,?,?,?,?)', nowIso(), ctx.sid, ctx.user?.id ?? null, path, (req.headers.referer || '').slice(0, 200) || null); } catch { /* */ } }
       return send(status, 'text/html; charset=utf-8', method === 'HEAD' ? '' : body, { 'Cache-Control': 'no-cache' });
     }
-    ctx.cartCount = S.cartCountOf(ctx.cartKey); const nf = P.notFound(ctx); return send(404, 'text/html; charset=utf-8', String(nf.body), { 'Cache-Control': 'no-cache' });
+    ctx.cartCount = S.cartCountOf(ctx.cartKey); const nf = W.notFound(ctx); return send(404, 'text/html; charset=utf-8', localize(String(nf.body), ctx.lang), { 'Cache-Control': 'no-cache' });
   } catch (e) {
     if (e instanceof HttpError) return e.status === 200 ? json(200, { ok: true }) : json(e.status, { error: e.message });
     console.error(e); return json(500, { error: 'Error interno. Intenta de nuevo.' });
@@ -131,6 +144,7 @@ const server = createServer(async (req, res) => {
 });
 
 if (process.env.SEED_DEMO !== '0' && seedIfEmpty()) console.log('Base de datos inicial creada con contenido y cuentas de prueba.');
+ensureBlocks();
 export { server };
 if (import.meta.url === `file://${process.argv[1]}`) {
   const port = +process.env.PORT || 3000;

@@ -13,6 +13,7 @@
   }
   let toastT; function toast(msg, err) { const t = $('.toast'); if (!t) return; t.textContent = msg; t.classList.toggle('err', !!err); t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 3200); }
   const STATIC = document.documentElement.dataset.static === '1';
+  const M = { es: { sending: 'Enviando…', fail: 'No se pudo enviar. Inténtalo de nuevo.', done: 'Listo, ¡gracias!' }, en: { sending: 'Sending…', fail: 'Could not send. Please try again.', done: 'Done, thank you!' }, pt: { sending: 'Enviando…', fail: 'Não foi possível enviar. Tente novamente.', done: 'Pronto, obrigado!' } }[(document.documentElement.lang || 'es').slice(0, 2)] || {};
   const track = (type, label) => STATIC ? null : fetch('/api/track', { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'fetch' }, body: JSON.stringify({ type, label }) }).catch(() => {});
 
   // Menú móvil
@@ -21,11 +22,11 @@
 
   // Formularios estáticos (Netlify Forms)
   $$('form[data-netlify-form]').forEach((f) => f.addEventListener('submit', async (e) => {
-    e.preventDefault(); const msg = $('.form-msg', f), btn = $('button:not([type=button])', f); msg.className = 'form-msg'; msg.textContent = 'Enviando…'; btn && (btn.disabled = true);
+    e.preventDefault(); const msg = $('.form-msg', f), btn = $('button:not([type=button])', f); msg.className = 'form-msg'; msg.textContent = M.sending; btn && (btn.disabled = true);
     try {
       const r = await fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(new FormData(f)).toString() });
-      if (!r.ok) throw new Error(); msg.classList.add('ok'); msg.textContent = f.dataset.ok || 'Listo, ¡gracias!'; f.reset();
-    } catch { msg.classList.add('err'); msg.textContent = 'No se pudo enviar. Inténtalo de nuevo.'; }
+      if (!r.ok) throw new Error(); msg.classList.add('ok'); msg.textContent = f.dataset.ok || M.done; f.reset();
+    } catch { msg.classList.add('err'); msg.textContent = M.fail; }
     btn && (btn.disabled = false);
   }));
 
@@ -70,7 +71,7 @@
   // Explorador de la tabla de Ishango
   const isPrime = (n) => { if (n < 2) return false; for (let i = 2; i * i <= n; i++) if (n % i === 0) return false; return true; };
   const factor = (n) => { const f = []; for (let p = 2; n > 1; p++) while (n % p === 0) { f.push(p); n /= p; } return f.join(' × '); };
-  const ex = $('[data-explorer]');
+  const ex = null; // el explorador ahora vive en extra.js (multilingüe)
   if (ex) {
     const cols = {}; $$('.grp', ex).forEach((g) => (cols[g.dataset.col] ||= []).push(+g.dataset.n));
     const partners = (col, n) => [n - 2, n + 2].filter((v) => cols[col].includes(v) && isPrime(v) && isPrime(n));
@@ -86,7 +87,7 @@
   }
 
   // Criba de Eratóstenes animada
-  const grid = $('[data-sieve-grid]');
+  const grid = null; // la criba ahora vive en extra.js (multilingüe y con colores)
   if (grid) {
     const msg = $('[data-sieve-msg]'); let run = 0; const cells = [];
     const build = () => { grid.innerHTML = ''; cells.length = 0; for (let i = 1; i <= 100; i++) { const s = document.createElement('span'); s.textContent = i; grid.appendChild(s); cells[i] = s; } };

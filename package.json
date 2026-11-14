@@ -7,7 +7,8 @@
   "engines": { "node": ">=22.13" },
   "scripts": {
     "start": "node --disable-warning=ExperimentalWarning server.js",
-    "build": "node --disable-warning=ExperimentalWarning scripts/build-static.mjs",
+    "build": "node --disable-warning=ExperimentalWarning scripts/build-html.mjs",
+    "build:html": "node --disable-warning=ExperimentalWarning scripts/build-html.mjs",
     "check:static": "node test/check-static.mjs",
     "test": "node --disable-warning=ExperimentalWarning test/smoke.mjs",
     "build:pdfs": "node scripts/export-content.mjs && python3 scripts/make_pdfs.py"

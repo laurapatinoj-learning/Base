@@ -1,7 +1,7 @@
-# Sitio estático generado por scripts/build-static.mjs (sin servidor).
+# Sitio estático: carpeta plana de HTML autónomos (generada por scripts/build-html.mjs, tres idiomas).
 [build]
-  command = "node --disable-warning=ExperimentalWarning scripts/build-static.mjs"
-  publish = "dist"
+  command = "node --disable-warning=ExperimentalWarning scripts/build-html.mjs"
+  publish = "html"
 
 [build.environment]
   NODE_VERSION = "22"
@@ -13,19 +13,5 @@
     X-Frame-Options = "DENY"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
-    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; form-action 'self'; base-uri 'self'"
-
-[[headers]]
-  for = "/css/*"
-  [headers.values]
-    Cache-Control = "public, max-age=3600"
-
-[[headers]]
-  for = "/js/*"
-  [headers.values]
-    Cache-Control = "public, max-age=3600"
-
-[[headers]]
-  for = "/img/*"
-  [headers.values]
-    Cache-Control = "public, max-age=86400"
+    # Los HTML llevan CSS y JS incrustados, por eso 'unsafe-inline'.
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; form-action 'self'; base-uri 'self'"

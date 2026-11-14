@@ -2,7 +2,7 @@
 <html lang="es-CO" data-static="1"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Números Empédocles e Ishango 60 · Base Parkway</title><meta name="description" content="El análisis de las sumas simétricas (60) introduce los números Empédocles n(e) y Ishango n(i), con un sexteto mixto de primos e impares.">
 
-<meta property="og:type" content="website"><meta property="og:site_name" content="Base Parkway"><meta property="og:locale" content="es_CO"><meta property="og:title" content="Números Empédocles e Ishango 60 · Base Parkway"><meta property="og:description" content="El análisis de las sumas simétricas (60) introduce los números Empédocles n(e) y Ishango n(i), con un sexteto mixto de primos e impares."><meta property="og:image" content="http://localhost/img/og-base.svg">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Base Parkway"><meta property="og:locale" content="es_CO"><meta property="og:title" content="Números Empédocles e Ishango 60 · Base Parkway"><meta property="og:description" content="El análisis de las sumas simétricas (60) introduce los números Empédocles n(e) y Ishango n(i), con un sexteto mixto de primos e impares."><meta property="og:image" content="https://base-parkway.netlify.app/img/og-base.svg">
 <meta name="twitter:card" content="summary_large_image"><meta name="theme-color" content="#5b0f25">
 <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjE4IiBmaWxsPSIjMDAwIi8+PGcgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjZmZmIj48cGF0aCBkPSJNNTAgMTIgTDg4IDMxIEw1MCA1MCBMMTIgMzEgWiIgc3Ryb2tlLXdpZHRoPSI2IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBhdGggZD0iTTEzIDU0IEw1MCA3MyBMODcgNTQgTTEzIDcwIEw1MCA4OSBMODcgNzAiIGZpbGw9Im5vbmUiIHN0cm9rZS13aWR0aD0iOSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PC9nPjwvc3ZnPgo=" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -156,18 +156,105 @@ fieldset{border:0;padding:0;margin:0 0 22px}legend{font-weight:600;margin-bottom
 .fold{border-top:1px solid var(--line);padding:4px 0}.fold summary{cursor:pointer;font:600 1.3rem var(--display);padding:14px 0;color:var(--bur-700);list-style:none;display:flex;justify-content:space-between;gap:12px}.fold summary::after{content:"+";font:400 1.6rem/1 var(--ui);color:var(--bur);transition:transform .25s}.fold[open] summary::after{transform:rotate(45deg)}.fold summary::-webkit-details-marker{display:none}
 .card-body p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .article h2{margin-top:1.6em}
+
+/* Convención de color: rojo = primo · verde = compuesto impar · negro = compuesto par */
+:root{--c-prime:#c8102e;--c-odd:#1b7f4b;--c-even:#0c0a0b}
+.n-p{background:var(--c-prime);color:#fff}.n-o{background:var(--c-odd);color:#fff}.n-e{background:var(--c-even);color:#fff}.n-1{background:#fff;color:#4a3f43;box-shadow:inset 0 0 0 1.5px #b9aeb2}
+.legend{list-style:none;display:flex;flex-wrap:wrap;gap:8px 18px;padding:0;margin:14px 0 0;font:500 .78rem var(--ui)}.legend li{display:flex;align-items:center;gap:7px}
+.sw{display:inline-block;width:14px;height:14px;border-radius:4px;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
+.hero .legend{justify-content:center;color:#e9dfe3;margin-top:18px}.hero .sw{box-shadow:0 0 0 1.5px #fff}.hero .sw.n-e{background:#0c0a0b}
+.center .legend{justify-content:center}
+
+/* Selector de idioma */
+.lang{display:flex;gap:2px;border:1px solid var(--line);border-radius:999px;padding:3px}.lang a{padding:5px 10px!important;font:600 .72rem var(--ui)!important;border-radius:999px!important;box-shadow:none!important;color:var(--ink)}
+.lang a[aria-current=true]{background:var(--ink);color:#fff!important}.lang a:hover{background:var(--tint)}.lang a[aria-current=true]:hover{background:var(--ink)}
+@media(max-width:980px){.lang{align-self:flex-start;margin:6px 14px}}
+
+/* Hueso del encabezado: cuerpo claro para que se lea el negro */
+.bone-body path,.bone-body circle{fill:#efe6df;stroke:#fff;stroke-opacity:.5}.bone-body circle{fill:none;stroke:#cdbfb6;stroke-opacity:1}
+.bone-lab{fill:#4a3f43!important;fill-opacity:1!important}
+.bone .tick{stroke-width:2.6}.bone .tick.t-p{stroke:var(--c-prime);stroke-width:3}.bone .tick.t-o{stroke:var(--c-odd)}.bone .tick.t-e{stroke:var(--c-even)}
+
+/* Explorador de la tabla (tema claro) */
+.explorer{background:var(--tint);color:var(--ink);border:1px solid var(--line)}
+.explorer .ex-row{border-top:1px solid var(--line)}.explorer .ex-label span{color:var(--muted)}
+.explorer .chip{border:1.5px solid #cdbfc4;color:var(--ink)}.explorer .chip:hover{border-color:var(--ink)}.explorer .chip[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}
+.explorer .grp{border:2px solid transparent;color:#fff}.explorer .grp.n-p{background:var(--c-prime)}.explorer .grp.n-o{background:var(--c-odd)}.explorer .grp.n-e{background:var(--c-even)}
+.explorer .grp .ticks i{background:#fff;opacity:.9}.explorer .grp:hover,.explorer .grp:focus-visible{border-color:var(--ink);box-shadow:0 0 0 2px #fff,0 0 0 4px var(--ink)}.explorer .grp.sel{border-color:var(--ink);box-shadow:0 0 0 2px #fff,0 0 0 4px var(--ink)}
+.explorer.show-twins .grp.is-twin{box-shadow:0 0 0 2px #fff,0 0 0 5px var(--bur-700);background:var(--c-prime)}.explorer.show-twins .grp:not(.is-twin){opacity:.28}
+.explorer .ex-sum small{color:var(--muted)}.explorer .ex-sum b{color:var(--ink)}
+.ex-readout{background:#fff;border:1px solid var(--line);color:var(--ink)}.ex-readout.light{background:#fff}
+.ex-stats div{background:#fff;border:1px solid var(--line)}.ex-stats dt{color:var(--muted)}.ex-stats dd{color:var(--ink)}
+
+/* Criba: colores al terminar */
+.sieve .n-p{background:var(--c-prime);color:#fff;border-color:var(--c-prime)}.sieve .n-o{background:var(--c-odd);color:#fff;border-color:var(--c-odd)}.sieve .n-e{background:var(--c-even);color:#fff;border-color:var(--c-even)}.sieve .n-1{background:#fff;color:#4a3f43}
+.sieve .final{opacity:1;text-decoration:none;transition:background .5s,color .5s,transform .5s var(--ease)}
+
+/* Imágenes del Periódico UNAL */
+.unal{margin:1.8em 0}.unal img{width:100%;height:auto;border-radius:12px;border:1px solid var(--line);display:block;background:#000}.unal figcaption{font:.78rem/1.45 var(--ui);color:var(--muted);margin-top:8px}
+.unal.tall img{max-width:560px;margin-inline:auto;background:#fff}.unal.tall figcaption{max-width:560px;margin-inline:auto}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}.gallery .unal{margin:0}.gallery.two{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.gallery-sec{margin-top:2.4em}
+.prof-card{border:1px solid var(--line);border-left:4px solid var(--bur);border-radius:0 var(--r) var(--r) 0;padding:20px 24px;margin:2em 0;background:#fff}.prof-card .prose{max-width:none;font-size:1rem}
+.band.prof{background:var(--tint)}.prof .prose{font-size:1.05rem;max-width:none}
+.portrait.small{max-width:200px;float:right;margin:0 0 16px 24px}.portrait.small img{box-shadow:6px 6px 0 var(--bur)}.author .prose h2{margin-top:1.6em}
+.consult{border-left:4px solid var(--bur)}
+
+/* Preguntas frecuentes */
+.faq{max-width:900px}.faq-index{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:0 0 2.4em}
+.faq-index a{display:flex;flex-direction:column;gap:4px;padding:14px;border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);font:500 .82rem/1.3 var(--ui);transition:.25s}.faq-index a b{font:600 1.5rem var(--display);color:var(--bur)}.faq-index a:hover{border-color:var(--bur);transform:translateY(-3px)}
+.faq-item{padding:2.2em 0;border-top:1px solid var(--line)}.faq-item h2{margin-top:0}.faq-item h3{font-size:1.25rem;margin:1.4em 0 .4em;color:var(--bur-700)}.faq-item h4{font-size:1.15rem;margin:0 0 .3em}
+.faq-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px}.uses{margin-top:12px}.use{padding:20px}.use p{font-size:.95rem;margin:0}
+.timeline{position:relative;margin:34px 22px 10px;height:130px}.timeline .track{position:absolute;left:0;right:0;top:20px;height:4px;background:var(--line);border-radius:4px}.timeline .track i{display:block;height:100%;width:0;background:var(--bur);border-radius:4px;transition:width 1.6s var(--ease)}.timeline.in .track i{width:100%}
+.tl-m{position:absolute;top:0;transform:translateX(-50%);background:none;border:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;padding:0;font:600 .72rem/1.2 var(--ui);color:var(--ink);width:96px}
+.tl-m .dot{width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid var(--bur);margin-top:13px;transition:transform .25s var(--ease),background .25s}.tl-m:hover .dot,.tl-m.on .dot{background:var(--c-prime);border-color:var(--c-prime);transform:scale(1.35)}.tl-m .nm{text-align:center}
+.tl-m:first-of-type{transform:translateX(-12px);align-items:flex-start}.tl-m:last-of-type{transform:translateX(calc(-100% + 12px));align-items:flex-end}.tl-m:first-of-type .nm{text-align:left}.tl-m:last-of-type .nm{text-align:right}
+.tl-detail{background:var(--tint);border-radius:10px;padding:14px 16px;font:.92rem/1.5 var(--ui);min-height:3.4em;margin:6px 0}
+@media(max-width:560px){.tl-m{width:60px;font-size:.62rem}}
+.map{margin:1.6em 0}.map-box{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--tint);cursor:zoom-in;max-width:560px;margin-inline:auto}.map.zoomed .map-box{cursor:zoom-out}
+.map-svg{display:block;width:100%;height:auto}.map-svg .sea{fill:var(--tint)}.map-svg .africa{fill:#ece3e6;stroke:#6f6166;stroke-width:1.2;stroke-linejoin:round}.map-svg .drc{fill:var(--bur-200);stroke:var(--bur);stroke-width:.9}.map-svg .uganda{fill:#d8d0d3;stroke:#6f6166;stroke-width:.7}
+.map-svg .lake{fill:#fff;stroke:var(--bur-700);stroke-width:.6}.map-svg .border{fill:none;stroke:var(--bur-900);stroke-width:1.1;stroke-dasharray:3 2}
+.map-svg .lbl{font:600 11px var(--ui);fill:#3b3236;paint-order:stroke;stroke:#fff;stroke-width:3px;stroke-linejoin:round}.map-svg .lbl.big{font-size:24px;letter-spacing:.3em;fill:#9a8d92}.map-svg .lbl.sm{font-size:3.4px;stroke-width:1px}.map-svg .detail .lbl{font-size:5px;stroke-width:1.6px}.map-svg .detail .lbl.sm{font-size:3.2px;stroke-width:1px}.map-svg .lbl.bord{fill:var(--bur-900)}
+.map-svg .detail{opacity:0;transition:opacity .6s .5s}.map.zoomed .detail{opacity:1}.map.zoomed .lbl.big{opacity:0}.map-svg .lbl.big{transition:opacity .4s}
+.map-svg .pinlab{font-size:16px;fill:var(--c-prime)}.map.zoomed .pinlab{font-size:4.6px}.map-svg .dot{fill:var(--c-prime);stroke:#fff;stroke-width:1}.map-svg .pulse{fill:var(--c-prime);opacity:.35;transform-box:fill-box;transform-origin:center;animation:pulse 2s ease-out infinite}
+@keyframes pulse{from{transform:scale(.6);opacity:.55}to{transform:scale(3.4);opacity:0}}
+.map-ctl{display:flex;gap:10px;justify-content:center;margin:14px 0;flex-wrap:wrap}.map figcaption{font:.82rem var(--ui);color:var(--muted);text-align:center}
+.poster{margin:1.6em 0}.poster-art{border:1px solid var(--ink);border-radius:6px;background:#fff;overflow:hidden}.poster-art svg{display:block;width:100%;height:auto}.poster figcaption{font:.82rem var(--ui);color:var(--muted);margin-top:8px}
+.notch{background:var(--tint);border:1px solid var(--line);border-radius:var(--r);padding:22px;margin:1.4em 0}.notch h3{margin-top:0}
+.notch-bone{height:84px;background:#efe6df;border:1.5px solid #bfb2a8;border-radius:42px;display:flex;align-items:center;padding:0 34px;margin:14px 0;overflow:hidden;position:relative}.notch-bone::after{content:"";position:absolute;right:-6px;top:50%;width:26px;height:10px;margin-top:-5px;background:#fff;border:1px solid #bfb2a8}
+.marks{display:flex;gap:4px;align-items:center;flex-wrap:nowrap}.marks i{display:block;width:3px;height:38px;background:var(--c-even);border-radius:2px;animation:carve .45s var(--ease) both;transform-origin:top}
+@keyframes carve{from{transform:scaleY(0);opacity:0}to{transform:none;opacity:1}}
+.notch .row{gap:10px;flex-wrap:wrap}
+.numgrid{margin:1.4em 0}.ng{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;max-width:480px}.ng button{aspect-ratio:1;border:0;border-radius:8px;font:600 clamp(.7rem,2.4vw,.95rem) var(--ui);cursor:pointer;transition:transform .2s var(--ease),box-shadow .2s}.ng button:hover,.ng button.sel{transform:scale(1.12);box-shadow:0 0 0 2px #fff,0 0 0 4px var(--ink)}
+@media(max-width:520px){.ng{grid-template-columns:repeat(8,1fr)}}
+
+/* Gráfico de Empédocles / Ishango 60 */
+.emp{background:var(--tint);border:1px solid var(--line);border-radius:var(--r);padding:20px;margin:1.4em 0}.emp-title{margin:0 0 12px;font-size:1.3rem}
+.emp-svg{width:100%;height:auto;display:block;background:#fff;border:1px solid var(--line);border-radius:10px;margin:12px 0}
+.emp-svg .gl{stroke:#eee4e7;stroke-width:1}.emp-svg .ax{font:9px var(--ui);fill:#6a5f63}.emp-svg .sec{font:700 13px var(--ui);fill:var(--ink)}
+.emp-svg .hl{stroke-width:1.4;stroke-dasharray:5 4;opacity:.85}.emp-svg .hl.n-p{stroke:var(--c-prime)}.emp-svg .hl.n-o{stroke:var(--c-odd)}.emp-svg .ylab{font:700 11px var(--ui)}.emp-svg .ylab.t-p{fill:var(--c-prime)}.emp-svg .ylab.t-o{fill:var(--c-odd)}
+.emp-svg .diag{stroke:#111;stroke-width:1.5;stroke-dasharray:6 4}.emp-svg .axis{stroke:var(--c-prime);stroke-width:1.4;stroke-dasharray:5 4;opacity:.45;transition:opacity .3s,stroke-width .3s}.emp-svg .axpt{fill:var(--c-prime)}
+.emp-svg .sextet{fill:#d6b8ee;opacity:0;transition:opacity .4s}.emp-svg .pair,.emp-svg .mirror{opacity:0;stroke-width:1.2;transition:opacity .4s}.emp-svg .pair{stroke:#6a5f63;stroke-dasharray:2 3}.emp-svg .mirror{stroke:var(--c-prime)}
+.emp-svg .pt{stroke:#fff;stroke-width:1.5;cursor:pointer;transition:r .2s,stroke .2s}.emp-svg .pt.n-p{fill:var(--c-prime)}.emp-svg .pt.n-o{fill:var(--c-odd)}.emp-svg .pt:hover,.emp-svg .pt:focus-visible,.emp-svg .pt.sel{stroke:#111;stroke-width:2.5;outline:none}
+.emp.show-sextet .sextet{opacity:.55}.emp.show-pairs .pair{opacity:1}.emp.show-sym .mirror{opacity:.8}.emp.show-sym .axis{opacity:1;stroke-width:2.2}
+.emp.show-ne .pt.ne{stroke:#111;stroke-width:3}.emp.show-ne .pt:not(.ne){opacity:.35}
+
+/* Biblioteca */
+.lib{list-style:none;padding:0;margin:0 0 2em}.lib li{border-top:1px solid var(--line);padding:18px 0}.lib li:last-child{border-bottom:1px solid var(--line)}.lib h3{margin:8px 0 4px;font-size:1.4rem}.lib p{margin:0 0 .4em}
 </style>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Números Empédocles e Ishango 60","description":"El análisis de las sumas simétricas (60) introduce los números Empédocles n(e) y Ishango n(i), con un sexteto mixto de primos e impares.","inLanguage":"es","publisher":{"@type":"Organization","name":"Base Parkway"},"dateModified":"2026-11-13T02:48:40.665Z"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Números Empédocles e Ishango 60","description":"El análisis de las sumas simétricas (60) introduce los números Empédocles n(e) y Ishango n(i), con un sexteto mixto de primos e impares.","inLanguage":"es","publisher":{"@type":"Organization","name":"Base Parkway"},"dateModified":"2026-11-14T00:12:11.018Z"}</script>
 </head><body class="">
 <a class="skip" href="#contenido">Saltar al contenido</a>
 <header class="site-header" id="top"><div class="wrap bar">
-<a class="brand-link" href="index.html" aria-label="Base Parkway — inicio"><span class="brand "><svg class="logo-mark " viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+<a class="brand-link" href="index.html" aria-label="Base Parkway — Inicio"><span class="brand "><svg class="logo-mark " viewBox="0 0 100 100" aria-hidden="true" focusable="false">
 <path class="l l1" d="M50 7 L93 29 L50 51 L7 29 Z" stroke-width="7" stroke-linejoin="round"/>
 <path class="l l2" d="M8 53 L50 75 L92 53" fill="none" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
 <path class="l l3" d="M8 72 L50 94 L92 72" fill="none" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wordmark"><b>BASE</b><span>Parkway</span></span></span></a>
 <button class="nav-toggle" aria-expanded="false" aria-controls="nav"><span class="sr">Menú</span><i></i><i></i><i></i></button>
-<nav id="nav" class="nav" aria-label="Principal"><a href="archivo.html" >Archivo</a><a href="fichas.html" aria-current="page">Fichas</a><a href="catalogo.html" >Catálogo</a><a href="agenda.html" >Agenda</a><a href="aula.html" >Aula</a>
+<nav id="nav" class="nav" aria-label="Principal"><a href="archivo.html" >Archivo</a><a href="preguntas.html" >Preguntas</a><a href="fichas.html" aria-current="page">Fichas</a><a href="biblioteca.html" >Biblioteca</a><a href="catalogo.html" >Catálogo</a><a href="aula.html" >Aula</a>
 <a class="btn sm" href="contacto.html">Contacto</a>
+<span class="nav-sep"></span>
+<div class="lang" role="group" aria-label="Idioma"><a href="fichas-numeros-empedocles-e-ishango-60.html" hreflang="es" lang="es" title="Español" aria-current="true">ES</a><a href="fichas-numeros-empedocles-e-ishango-60-en.html" hreflang="en" lang="en" title="English" >EN</a><a href="fichas-numeros-empedocles-e-ishango-60-pt.html" hreflang="pt" lang="pt" title="Português" >PT</a></div>
 </nav></div></header>
 
 <main id="contenido" tabindex="-1"><article class="wrap article"><nav class="crumbs" aria-label="Migas de pan"><a href="index.html">Inicio</a> <span aria-hidden="true">/</span> <a href="fichas.html">Fichas</a> <span aria-hidden="true">/</span> <span aria-current="page">Ficha 04 · Concepto</span></nav><header class="article-head"><p class="kicker">Ficha 04 · Concepto</p><h1>Números Empédocles e Ishango 60</h1><p class="lead">Dos estructuras que se replican</p></header>
@@ -179,16 +266,15 @@ fieldset{border:0;padding:0;margin:0 0 22px}legend{font-weight:600;margin-bottom
 <p>La representación en el plano cartesiano muestra la simetría de estas relaciones. El análisis aritmético y geométrico identifica una estructura que se replica y da cuenta de un <strong>triángulo rectángulo isósceles</strong> a diferentes escalas.</p>
 <h3>Por qué importa</h3>
 <p>Según el autor, esta lectura puede servir para comenzar a descifrar enigmas de los primos, como la forma en que están distribuidos y la distancia entre ellos.</p></div>
-
 <nav class="pager" aria-label="Fichas"><a href="fichas-primos-gemelos-en-el-hueso.html">← Primos gemelos en el hueso</a><a href="fichas-168-pi-de-mil.html">168 = π(1000): ¿coincidencia? →</a></nav></article></main>
 <footer class="site-footer"><div class="wrap grid4">
 <div><span class="brand inv"><svg class="logo-mark " viewBox="0 0 100 100" aria-hidden="true" focusable="false">
 <path class="l l1" d="M50 7 L93 29 L50 51 L7 29 Z" stroke-width="7" stroke-linejoin="round"/>
 <path class="l l2" d="M8 53 L50 75 L92 53" fill="none" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
 <path class="l l3" d="M8 72 L50 94 L92 72" fill="none" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wordmark"><b>BASE</b><span>Parkway</span></span></span><p class="muted">Editorial y aula académica. Archivo principal sobre el hueso de Ishango.</p></div>
-<div><h2>Explorar</h2><ul class="plain"><li><a href="archivo.html">Archivo Ishango</a></li><li><a href="fichas.html">Fichas editoriales</a></li><li><a href="catalogo.html">Catálogo</a></li><li><a href="agenda.html">Agenda</a></li></ul></div>
-<div><h2>Comunidad</h2><ul class="plain"><li><a href="aula.html">Aula virtual</a></li><li><a href="newsletter.html">Boletín</a></li><li><a href="contacto.html">Contacto</a></li><li><a href="privacidad.html">Privacidad</a></li></ul></div>
-<div><h2>Boletín</h2><form class="inline-form" name="boletin" method="POST" data-netlify="true" netlify-honeypot="website" data-netlify-form data-ok="¡Listo! Quedaste en la lista del boletín."><input type="hidden" name="form-name" value="boletin"><label class="sr" for="fn-email">Correo</label><input id="fn-email" name="email" type="email" required placeholder="tu@correo.com" autocomplete="email"><input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true"><button class="btn sm light">Suscribirme</button><p class="form-msg" role="status"></p></form></div>
+<div><h2>Explorar</h2><ul class="plain"><li><a href="archivo.html">Archivo</a></li><li><a href="preguntas.html">Preguntas</a></li><li><a href="fichas.html">Fichas</a></li><li><a href="catalogo.html">Catálogo</a></li><li><a href="agenda.html">Agenda</a></li></ul></div>
+<div><h2>Comunidad</h2><ul class="plain"><li><a href="autor.html">El profesor</a></li><li><a href="biblioteca.html">Biblioteca</a></li><li><a href="aula.html">Aula</a></li><li><a href="newsletter.html">Boletín</a></li><li><a href="contacto.html">Contacto</a></li><li><a href="privacidad.html">Privacidad</a></li></ul></div>
+<div><h2>Boletín</h2><form class="inline-form" name="boletin" method="POST" data-netlify="true" netlify-honeypot="website" data-netlify-form data-ok="¡Listo! Quedaste en la lista del boletín."><input type="hidden" name="form-name" value="boletin"><label class="sr" for="fn-email">Correo electrónico</label><input id="fn-email" name="email" type="email" required placeholder="tu@correo.com" autocomplete="email"><input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true"><button class="btn sm light">Suscribirme</button><p class="form-msg" role="status"></p></form></div>
 </div><div class="wrap legal"><span>© 2026 Base Parkway. Fuente del archivo: <a href="https://periodico.unal.edu.co/articulos/el-enigmatico-hueso-de-ishango-secreto-ancestral-de-numeros-primos-gemelos" rel="noopener">Periódico UNAL</a>.</span><a href="#top">Volver arriba ↑</a></div></footer>
 <div class="toast" role="status" aria-live="polite"></div>
 <script>(() => {
@@ -206,6 +292,7 @@ fieldset{border:0;padding:0;margin:0 0 22px}legend{font-weight:600;margin-bottom
   }
   let toastT; function toast(msg, err) { const t = $('.toast'); if (!t) return; t.textContent = msg; t.classList.toggle('err', !!err); t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 3200); }
   const STATIC = document.documentElement.dataset.static === '1';
+  const M = { es: { sending: 'Enviando…', fail: 'No se pudo enviar. Inténtalo de nuevo.', done: 'Listo, ¡gracias!' }, en: { sending: 'Sending…', fail: 'Could not send. Please try again.', done: 'Done, thank you!' }, pt: { sending: 'Enviando…', fail: 'Não foi possível enviar. Tente novamente.', done: 'Pronto, obrigado!' } }[(document.documentElement.lang || 'es').slice(0, 2)] || {};
   const track = (type, label) => STATIC ? null : fetch('/api/track', { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'fetch' }, body: JSON.stringify({ type, label }) }).catch(() => {});
 
   // Menú móvil
@@ -214,11 +301,11 @@ fieldset{border:0;padding:0;margin:0 0 22px}legend{font-weight:600;margin-bottom
 
   // Formularios estáticos (Netlify Forms)
   $$('form[data-netlify-form]').forEach((f) => f.addEventListener('submit', async (e) => {
-    e.preventDefault(); const msg = $('.form-msg', f), btn = $('button:not([type=button])', f); msg.className = 'form-msg'; msg.textContent = 'Enviando…'; btn && (btn.disabled = true);
+    e.preventDefault(); const msg = $('.form-msg', f), btn = $('button:not([type=button])', f); msg.className = 'form-msg'; msg.textContent = M.sending; btn && (btn.disabled = true);
     try {
       const r = await fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(new FormData(f)).toString() });
-      if (!r.ok) throw new Error(); msg.classList.add('ok'); msg.textContent = f.dataset.ok || 'Listo, ¡gracias!'; f.reset();
-    } catch { msg.classList.add('err'); msg.textContent = 'No se pudo enviar. Inténtalo de nuevo.'; }
+      if (!r.ok) throw new Error(); msg.classList.add('ok'); msg.textContent = f.dataset.ok || M.done; f.reset();
+    } catch { msg.classList.add('err'); msg.textContent = M.fail; }
     btn && (btn.disabled = false);
   }));
 
@@ -263,7 +350,7 @@ fieldset{border:0;padding:0;margin:0 0 22px}legend{font-weight:600;margin-bottom
   // Explorador de la tabla de Ishango
   const isPrime = (n) => { if (n < 2) return false; for (let i = 2; i * i <= n; i++) if (n % i === 0) return false; return true; };
   const factor = (n) => { const f = []; for (let p = 2; n > 1; p++) while (n % p === 0) { f.push(p); n /= p; } return f.join(' × '); };
-  const ex = $('[data-explorer]');
+  const ex = null; // el explorador ahora vive en extra.js (multilingüe)
   if (ex) {
     const cols = {}; $$('.grp', ex).forEach((g) => (cols[g.dataset.col] ||= []).push(+g.dataset.n));
     const partners = (col, n) => [n - 2, n + 2].filter((v) => cols[col].includes(v) && isPrime(v) && isPrime(n));
@@ -279,7 +366,7 @@ fieldset{border:0;padding:0;margin:0 0 22px}legend{font-weight:600;margin-bottom
   }
 
   // Criba de Eratóstenes animada
-  const grid = $('[data-sieve-grid]');
+  const grid = null; // la criba ahora vive en extra.js (multilingüe y con colores)
   if (grid) {
     const msg = $('[data-sieve-msg]'); let run = 0; const cells = [];
     const build = () => { grid.innerHTML = ''; cells.length = 0; for (let i = 1; i <= 100; i++) { const s = document.createElement('span'); s.textContent = i; grid.appendChild(s); cells[i] = s; } };
@@ -298,6 +385,114 @@ fieldset{border:0;padding:0;margin:0 0 22px}legend{font-weight:600;margin-bottom
       msg.textContent = `${tw.length} parejas de primos gemelos: ${tw.map((p) => `(${p}, ${p + 2})`).join(' ')}.`; track('sieve', 'completa');
     };
     build(); $('[data-sieve=play]').addEventListener('click', play); $('[data-sieve=reset]').addEventListener('click', () => { run++; build(); msg.textContent = 'Pulsa «Reproducir» para ver la criba.'; });
+  }
+})();
+
+(() => {
+  'use strict';
+  const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const L = (document.documentElement.lang || 'es').slice(0, 2); const lang = ['es', 'en', 'pt'].includes(L) ? L : 'es';
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches; const sleep = (ms) => new Promise((r) => setTimeout(r, reduce ? 0 : ms));
+  const isPrime = (n) => { if (n < 2) return false; for (let i = 2; i * i <= n; i++) if (n % i === 0) return false; return true; };
+  const typeOf = (n) => (n < 2 ? '1' : isPrime(n) ? 'p' : n % 2 ? 'o' : 'e');
+  const factor = (n) => { const f = []; for (let p = 2; n > 1; p++) while (n % p === 0) { f.push(p); n /= p; } return f.join(' × '); };
+  const T = {
+    es: { p: (n) => `${n} es primo`, o: (n) => `${n} es compuesto impar (${factor(n)})`, e: (n) => `${n} es compuesto par (${factor(n)})`, one: () => '1 no es primo ni compuesto',
+      exr: (n, c, ty, tw, s) => `${n} marcas (columna ${c}). ${ty}.${tw ? ` Forma pareja de primos gemelos con ${tw}.` : ''} La columna ${c} suma ${s}.`,
+      s1: 'El 1 no es primo: se descarta.', sm: (p) => `Múltiplos de ${p}: se tachan.`, sp: (n) => `Quedan ${n} primos menores que 100. Ahora, los primos gemelos (p, p+2)…`, st: (n, l) => `${n} parejas de primos gemelos: ${l}. Cada número toma su color.`,
+      tl: (a, b, c) => `${a} — ${b}. ${c}`, nz: 'Añade la primera marca.', nr: (n, ty) => `Marcas en el grupo: ${n} — ${ty}.`,
+      er: (y, ty, a, b, pair) => `Número ${y}: ${ty}. Sección A: ${a} · Sección B: ${b}.${pair ? ` Su pareja simétrica: ${y} + ${30 - y} = 30.` : ''}`, ehint: 'Pasa el cursor o enfoca un punto para ver sus coordenadas.' },
+    en: { p: (n) => `${n} is prime`, o: (n) => `${n} is an odd composite (${factor(n)})`, e: (n) => `${n} is an even composite (${factor(n)})`, one: () => '1 is neither prime nor composite',
+      exr: (n, c, ty, tw, s) => `${n} marks (column ${c}). ${ty}.${tw ? ` Forms a twin-prime pair with ${tw}.` : ''} Column ${c} adds up to ${s}.`,
+      s1: '1 is not prime: it is discarded.', sm: (p) => `Multiples of ${p}: crossed out.`, sp: (n) => `${n} primes below 100 remain. Now, the twin primes (p, p+2)…`, st: (n, l) => `${n} twin-prime pairs: ${l}. Every number takes its colour.`,
+      tl: (a, b, c) => `${a} — ${b}. ${c}`, nz: 'Add the first mark.', nr: (n, ty) => `Marks in the group: ${n} — ${ty}.`,
+      er: (y, ty, a, b, pair) => `Number ${y}: ${ty}. Section A: ${a} · Section B: ${b}.${pair ? ` Its symmetric partner: ${y} + ${30 - y} = 30.` : ''}`, ehint: 'Hover or focus a point to see its coordinates.' },
+    pt: { p: (n) => `${n} é primo`, o: (n) => `${n} é composto ímpar (${factor(n)})`, e: (n) => `${n} é composto par (${factor(n)})`, one: () => '1 não é primo nem composto',
+      exr: (n, c, ty, tw, s) => `${n} marcas (coluna ${c}). ${ty}.${tw ? ` Forma par de primos gêmeos com ${tw}.` : ''} A coluna ${c} soma ${s}.`,
+      s1: 'O 1 não é primo: é descartado.', sm: (p) => `Múltiplos de ${p}: são riscados.`, sp: (n) => `Restam ${n} primos menores que 100. Agora, os primos gêmeos (p, p+2)…`, st: (n, l) => `${n} pares de primos gêmeos: ${l}. Cada número assume sua cor.`,
+      tl: (a, b, c) => `${a} — ${b}. ${c}`, nz: 'Adicione a primeira marca.', nr: (n, ty) => `Marcas no grupo: ${n} — ${ty}.`,
+      er: (y, ty, a, b, pair) => `Número ${y}: ${ty}. Seção A: ${a} · Seção B: ${b}.${pair ? ` Seu par simétrico: ${y} + ${30 - y} = 30.` : ''}`, ehint: 'Passe o cursor ou foque um ponto para ver suas coordenadas.' },
+  }[lang];
+  const typeText = (n) => (T[typeOf(n)] || T.one)(n);
+
+  // ---- Explorador de la tabla de Ishango
+  const ex = $('[data-explorer]');
+  if (ex) {
+    const cols = {}; $$('.grp', ex).forEach((g) => (cols[g.dataset.col] ||= []).push(+g.dataset.n));
+    const partners = (c, n) => [n - 2, n + 2].filter((v) => cols[c].includes(v) && isPrime(v) && isPrime(n));
+    let pairs = 0, primes = 0;
+    for (const arr of Object.values(cols)) { const sp = [...new Set(arr)].filter(isPrime); sp.forEach((v) => { if (sp.includes(v + 2)) pairs++; }); }
+    $$('.grp', ex).forEach((g) => { const n = +g.dataset.n; if (isPrime(n)) primes++; if (isPrime(n) && partners(g.dataset.col, n).length) g.classList.add('is-twin'); });
+    $('[data-stat=primes]', ex).textContent = `${primes} / 16`; $('[data-stat=twins]', ex).textContent = pairs;
+    const out = $('[data-readout]', ex);
+    const say = (g) => { const n = +g.dataset.n, c = g.dataset.col, p = partners(c, n); $$('.grp.sel', ex).forEach((x) => x.classList.remove('sel')); g.classList.add('sel');
+      out.textContent = T.exr(n, c, typeText(n), p.length ? p.map((v) => `(${Math.min(v, n)}, ${Math.max(v, n)})`).join(' / ') : '', cols[c].reduce((a, b) => a + b, 0)); };
+    $$('.grp', ex).forEach((g) => { g.addEventListener('click', () => say(g)); g.addEventListener('mouseenter', () => say(g)); g.addEventListener('focus', () => say(g)); });
+    $$('[data-toggle]', ex).forEach((b) => b.addEventListener('click', () => { const on = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', on); ex.classList.toggle('show-' + b.dataset.toggle, on); }));
+  }
+
+  // ---- Criba de Eratóstenes (colores al terminar)
+  const grid = $('[data-sieve-grid]');
+  if (grid) {
+    const msg = $('[data-sieve-msg]'); const idle = msg.textContent; let run = 0; const cells = [];
+    const build = () => { grid.innerHTML = ''; cells.length = 0; for (let i = 1; i <= 100; i++) { const s = document.createElement('span'); s.textContent = i; grid.appendChild(s); cells[i] = s; } };
+    const play = async () => {
+      const id = ++run; build(); const ok = () => id === run; msg.textContent = T.s1; cells[1].classList.add('out'); await sleep(500);
+      for (const p of [2, 3, 5, 7]) {
+        if (!ok()) return; cells[p].classList.add('cur'); msg.textContent = T.sm(p); await sleep(450);
+        for (let m = p * 2; m <= 100; m += p) cells[m].classList.add('mult');
+        await sleep(450); if (!ok()) return;
+        for (let m = p * 2; m <= 100; m += p) { cells[m].classList.remove('mult'); cells[m].classList.add('out'); }
+        cells[p].classList.remove('cur'); await sleep(300);
+      }
+      if (!ok()) return; const pr = []; for (let i = 2; i <= 100; i++) if (!cells[i].classList.contains('out')) { cells[i].classList.add('n-p', 'final'); pr.push(i); }
+      msg.textContent = T.sp(pr.length); await sleep(900); if (!ok()) return;
+      for (let i = 1; i <= 100; i++) { const c = cells[i]; if (c.classList.contains('out')) { c.classList.remove('out'); c.classList.add('final', 'n-' + typeOf(i)); } }
+      const tw = pr.filter((p) => pr.includes(p + 2)); tw.forEach((p) => { cells[p].classList.add('twin'); cells[p + 2].classList.add('twin'); });
+      msg.textContent = T.st(tw.length, tw.map((p) => `(${p}, ${p + 2})`).join(' '));
+    };
+    build(); $('[data-sieve=play]').addEventListener('click', play); $('[data-sieve=reset]').addEventListener('click', () => { run++; build(); msg.textContent = idle; });
+  }
+
+  // ---- Línea de tiempo (pregunta 1)
+  const tl = $('[data-timeline]');
+  if (tl) {
+    const data = JSON.parse(tl.dataset.tl); const det = $('[data-tl-detail]');
+    const sel = (i) => { $$('.tl-m', tl).forEach((m) => m.classList.toggle('on', +m.dataset.i === i)); const [a, b, c] = data[i - 1]; det.textContent = T.tl(a, b, c); };
+    $$('.tl-m', tl).forEach((m) => { const i = +m.dataset.i; m.addEventListener('click', () => sel(i)); m.addEventListener('mouseenter', () => sel(i)); m.addEventListener('focus', () => sel(i)); });
+    const io = 'IntersectionObserver' in window ? new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { tl.classList.add('in'); io.disconnect(); } }), { threshold: .4 }) : null; io ? io.observe(tl) : tl.classList.add('in');
+  }
+
+  // ---- Mapa de África con zoom a la región del Congo (pregunta 2)
+  const map = $('[data-map]');
+  if (map) {
+    const svg = $('.map-svg', map); const full = svg.dataset.full.split(' ').map(Number), zoom = svg.dataset.zoom.split(' ').map(Number); let cur = full.slice(), raf = 0, zoomed = false;
+    const go = (to) => { cancelAnimationFrame(raf); const from = cur.slice(), t0 = performance.now(), dur = reduce ? 1 : 1100; const step = (t) => { const p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 3); cur = from.map((v, i) => v + (to[i] - v) * e); svg.setAttribute('viewBox', cur.join(' ')); if (p < 1) raf = requestAnimationFrame(step); }; raf = requestAnimationFrame(step); };
+    const set = (z) => { zoomed = z; map.classList.toggle('zoomed', z); go(z ? zoom : full); };
+    $('.map-box', map).addEventListener('click', () => set(!zoomed));
+    $('[data-map-zoom=in]', map).addEventListener('click', () => set(true)); $('[data-map-zoom=out]', map).addEventListener('click', () => set(false));
+  }
+
+  // ---- Tallar marcas (pregunta 4)
+  const nb = $('[data-notch]');
+  if (nb) {
+    const marks = $('[data-marks]', nb), out = $('[data-notch-readout]', nb); let n = 0;
+    const draw = () => { const c = marks.children.length; if (c < n) for (let i = c; i < n; i++) marks.appendChild(document.createElement('i')); else while (marks.children.length > n) marks.lastChild.remove(); out.textContent = n ? T.nr(n, typeText(n)) : T.nz; };
+    $('[data-notch-add]', nb).addEventListener('click', () => { if (n < 30) { n++; draw(); } }); $('[data-notch-sub]', nb).addEventListener('click', () => { if (n > 0) { n--; draw(); } }); $('[data-notch-reset]', nb).addEventListener('click', () => { n = 0; draw(); });
+  }
+
+  // ---- Cuadrícula de números 1-40 (pregunta 5)
+  const ng = $('[data-numgrid]');
+  if (ng) { const out = $('[data-grid-readout]', ng); $$('button', ng).forEach((b) => b.addEventListener('click', () => { $$('button.sel', ng).forEach((x) => x.classList.remove('sel')); b.classList.add('sel'); out.textContent = typeText(+b.dataset.n) + '.'; })); }
+
+  // ---- Distribución de primos en 60 n(i) / 60 n(e)
+  const emp = $('[data-emp]');
+  if (emp) {
+    const out = $('[data-emp-readout]', emp); const SET = [9, 11, 13, 17, 19, 21];
+    const sec = (s, y) => (s === 'A' ? `(${30 - y}, ${y})` : `(${30 + y}, ${y})`);
+    const say = (p) => { $$('.pt.sel', emp).forEach((x) => x.classList.remove('sel')); p.classList.add('sel'); const y = +p.dataset.y; out.textContent = T.er(y, typeText(y), sec('A', y), sec('B', y), SET.includes(30 - y)); };
+    $$('.pt', emp).forEach((p) => { p.addEventListener('mouseenter', () => say(p)); p.addEventListener('focus', () => say(p)); p.addEventListener('click', () => say(p)); });
+    $$('[data-emp-toggle]', emp).forEach((b) => b.addEventListener('click', () => { const on = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', on); emp.classList.toggle('show-' + b.dataset.empToggle, on); }));
   }
 })();
 </script></body></html>
