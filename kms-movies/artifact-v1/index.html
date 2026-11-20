@@ -241,7 +241,7 @@ const BANK = [
   { id: "x1", film: "mix", type: "poll", text: "¿Cuál de las tres películas quieres ver primero?", opts: ["El poeta", "El contador", "Tropic Thunder", "Las tres seguidas"], dur: 20, quick: 1, expl: "Encuesta de opinión: no suma puntos." }
 ];
 const BY_ID = Object.fromEntries(BANK.map(q => [q.id, q]));
-const MODES = { mc: "Opción múltiple", tf: "Verdadero o falso", multi: "Selección múltiple", type: "Respuesta escrita", slider: "Deslizador", order: "Ordenar", poll: "Encuesta" };
+const MODES = { mc: "Opción múltiple", tf: "Verdadero o falso", multi: "Selección múltiple", type: "Respuesta escrita", slider: "Deslizador", order: "Ordenar" };
 
 /* ========= Utilidades ========= */
 const $ = (s, r = document) => r.querySelector(s);
@@ -459,7 +459,7 @@ function setup() {
   $("#home").onclick = () => { location.hash = ""; H.G = null; landing(); };
   $("#create").onclick = createGame; count();
 }
-const ORDER = ["p1", "c1", "t1", "p2", "c3", "t3", "p3", "c4", "t7", "p4", "c2", "t5", "p5", "t6", "c5", "p6", "t4", "t2", "c6", "x1"];
+const ORDER = ["p1", "c1", "t1", "p2", "c3", "t3", "p3", "c4", "t7", "p4", "c2", "t5", "p5", "t6", "c5", "p6", "t4", "t2", "c6"];
 function buildList() {
   const sel = Object.keys(H.picks).filter(k => H.picks[k]);
   let l = ORDER.filter(id => { const q = BY_ID[id]; return q.film === "mix" ? sel.length >= 2 : sel.includes(q.film); });
