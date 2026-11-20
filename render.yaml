@@ -1,0 +1,15 @@
+# Blueprint de Render: https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: kms-movies
+    runtime: node
+    rootDir: kms-movies/server
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /healthz
+    plan: free
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: HOST_PASSWORD
+        sync: false   # Render te pide el valor al crear el Blueprint
