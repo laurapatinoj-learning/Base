@@ -102,6 +102,13 @@ KMS_API_URL=https://kms-movies.onrender.com node build-static.js dist
 Genera `dist/` con `index.html` (CSS y JavaScript incluidos), `config.js`, `img/` y `media/`. Sube esa carpeta a cualquier hosting de archivos.
 Si cambias de servidor después, solo edita `config.js` (`window.KMS_CONFIG = { api: "https://..." }`).
 
+### Archivos listos para usar
+
+- `kms-movies/kms-movies.html`: **un solo archivo HTML** (CSS, JavaScript e imágenes incluidos, 2 MB). Ábrelo con un editor, busca `window.KMS_CONFIG` y escribe en `api` la URL de tu servidor en Render. No incluye los videos de Remotion: usa las animaciones de respaldo.
+- `kms-movies/kms-movies-github-pages.zip`: carpeta completa (`index.html`, `config.js`, `img/`, `media/` con los videos) lista para subir a GitHub Pages o a cualquier hosting. Edita `config.js` con la URL de Render.
+
+Para regenerarlos: `node kms-movies/server/build-static.js kms-movies.html --single` y `node kms-movies/server/build-static.js dist`.
+
 ### Qué tener en cuenta
 
 - El plan gratuito de Render apaga el servicio tras 15 minutos sin tráfico y tarda cerca de un minuto en despertar. Abre la URL del servidor antes de empezar con el grupo.

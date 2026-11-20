@@ -148,7 +148,7 @@
     opts.forEach(v => { const x = btn("", "", String(v)); x.onpointerdown = e => { e.preventDefault(); v === ans ? c.win() : c.fail(); }; ch.append(x); }); c.box.append(ch);
   } };
 
-  const faceURL = n => `img/caras/cara-${String(n).padStart(2, "0")}.png`;
+  const faceURL = n => window.kmsAsset("img/caras/cara-" + String(n).padStart(2, "0") + ".png");
   /* Elige a un compañero como objetivo (misma semilla para todos) y devuelve el reparto de caras */
   function cast(c, extra) {
     const named = c.faces.filter(f => f.avatar), all = shuffle([...Array(13).keys()].map(i => i + 1), c.rnd);

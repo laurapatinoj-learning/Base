@@ -7,7 +7,7 @@ const app = $("#app");
 /* API: vacío = mismo origen (Render). Con GitHub Pages, config.js apunta al servicio de Render. */
 const API = String((window.KMS_CONFIG && window.KMS_CONFIG.api) || "").replace(/\/+$/, "");
 /* Rutas de archivos relativas, para que funcionen en subcarpetas como usuario.github.io/repo/ */
-const A = p => String(p || "").replace(/^\/+/, "");
+const A = p => window.kmsAsset(p);
 const COLORS = ["#ff3355", "#2f7bff", "#ffc21a", "#2ed36a", "#a855f7"];
 const MODES = { mc: "Opción múltiple", img: "Adivina la imagen", imgopt: "Elige la imagen", tf: "Desliza: verdadero o falso", multi: "Selección múltiple", type: "Respuesta escrita", slider: "Deslizador", order: "Arrastra para ordenar", match: "Emparejar" };
 const ROLES = {
@@ -29,7 +29,7 @@ const post = (p, b) => fetch(API + p, { method: "POST", headers: { "Content-Type
 const creds = () => ({ code: S.code, id: S.id, token: S.token });
 const shapeSVG = i => `<svg class="sh" viewBox="0 0 100 100" aria-hidden="true">${['<path d="M50 8 L94 88 H6 Z"/>', '<path d="M50 4 L96 50 L50 96 L4 50 Z"/>', '<circle cx="50" cy="50" r="44"/>', '<rect x="10" y="10" width="80" height="80" rx="6"/>', '<path d="M50 6 L62 38 L96 38 L68 58 L79 92 L50 71 L21 92 L32 58 L4 38 L38 38 Z"/>'][i % 5]}</svg>`;
 const avatar = (p, cls = "", attrs = "") => p.avatar
-  ? `<span class="av img ${cls}" ${attrs} style="border-color:${esc(p.color)}"><img src="img/caras/cara-${String(p.avatar).padStart(2, "0")}.png" alt="${esc(p.name)}" loading="lazy" decoding="async"></span>`
+  ? `<span class="av img ${cls}" ${attrs} style="border-color:${esc(p.color)}"><img src="${A("img/caras/cara-" + String(p.avatar).padStart(2, "0") + ".png")}" alt="${esc(p.name)}" loading="lazy" decoding="async"></span>`
   : `<span class="av ${cls}" ${attrs} style="background:${esc(p.color)};color:#14102b">${esc((p.name || "?").charAt(0).toUpperCase())}</span>`;
 const filmChip = f => `<span class="chip" style="background:${esc(f?.color || "#ffc21a")}">${esc(f?.name || "")}</span>`;
 const nowS = () => Date.now() + skew;
@@ -208,7 +208,8 @@ function landing() {
       <button class="role host" id="goHost"><h2>Organizar</h2><p>Crea la sala, comparte el PIN y dirige la función desde la pantalla grande.</p></button>
       <button class="role play" id="goPlay"><h2>Jugar</h2><p>Entra con el PIN, elige tu personaje y ayuda al equipo con preguntas y microjuegos.</p></button>
     </div>
-    <div class="posters">${[["poeta", "El Poeta", "Colombia · 2025"], ["contador", "El Contador", "Ben Affleck · 2016"], ["tropic", "Tropic Thunder", "Dir. Ben Stiller · 2008"]].map(([k, n, s]) => `<div class="poster" style="--c:${FILMCOL[k]};background-image:url(img/${k}.jpg)"><div><b>${n}</b><span>${s}</span></div></div>`).join("")}</div>`);
+    <div class="posters">${[["poeta", "El Poeta", "Colombia · 2025"], ["contador", "El Contador", "Ben Affleck · 2016"], ["tropic", "Tropic Thunder", "Dir. Ben Stiller · 2008"]].map(([k, n, s]) => `<div class="poster" style="--c:${FILMCOL[k]};background-image:url(${A("img/" + k + ".jpg")})"><div><b>${n}</b><span>${s}</span></div></div>`).join("")}</div>`);
+  if (!API && location.protocol === "file:") app.insertAdjacentHTML("afterbegin", `<div class="err">Falta la dirección del servidor. Abre este archivo con un editor, busca <b>window.KMS_CONFIG</b> y escribe en <b>api</b> la URL de tu servicio de Render (por ejemplo https://kms-movies.onrender.com).</div>`);
   $("#goHost").onclick = () => { beep(523, .1); location.hash = "host"; hostEntry(); };
   $("#goPlay").onclick = () => { beep(784, .1); location.hash = ""; joinScreen(pin); };
   TEAM.create($("#lphoto"), { mode: "landing", scroll: innerWidth < 760, onPick: n => { S.prefAvatar = n; beep(784, .1, "triangle"); jingle(true); joinScreen(pin); } });
@@ -329,7 +330,7 @@ function hostLobby() {
         <div class="pin" aria-label="PIN de la sala">${esc(s.code)}</div>
         <div class="row center"><div class="qr" id="qr" hidden></div><button class="btn sm cyan" id="copy">Copiar enlace</button></div>
       </div>
-      <video class="vid" id="intro" src="media/intro.mp4" muted playsinline loop autoplay controls></video>
+      <video class="vid" id="intro" src="media/intro.mp4" muted playsinline loop autoplay controls onerror="this.hidden=true"></video>
     </div>
     <div class="card"><h2 style="font-size:1.6rem;margin-bottom:10px">La foto del equipo</h2><div id="hphoto"></div></div>
     <div class="card"><div class="top"><h2 style="font-size:1.6rem">El equipo <span id="pc" class="mut"></span></h2><span class="mut">${s.total} escenas · ${s.maxHearts - 1} vidas al inicio</span></div><div id="plist" class="players" style="margin-top:12px"></div></div>
@@ -493,7 +494,7 @@ function starsHTML(n) { return `<div class="stars" aria-label="${n} de 3 estrell
 function awardsHTML() { const a = ST.awards || []; return a.length ? `<div class="awards">${a.map((x, i) => `<div class="award" style="animation-delay:${.6 + i * .15}s">${avatar(x)}<div><small>${esc(x.title)}</small><b>${esc(x.name)}</b><span class="mut">${esc(x.note)}</span></div></div>`).join("")}</div>` : ""; }
 function hostEnd() {
   const s = ST;
-  view(`${s.win ? `<video class="vid" src="media/finale.mp4" autoplay muted playsinline style="max-height:34vh;object-fit:cover"></video>` : ""}
+  view(`${s.win ? `<video class="vid" src="media/finale.mp4" autoplay muted playsinline style="max-height:34vh;object-fit:cover" onerror="this.hidden=true"></video>` : ""}
     <div class="res-hero ${s.win ? "ok" : "bad"}"><h1 style="font-size:clamp(2.2rem,8vw,4.5rem)">${s.win ? "¡FUNCIÓN COMPLETADA!" : "¡SE CORTÓ LA FUNCIÓN!"}</h1>${starsHTML(s.stars)}
       <div class="pts"><span id="pp">0</span> pts de equipo</div><div class="flame">${HEART.replace("<svg", '<svg style="fill:#ff3355"')} ${s.hearts} vidas restantes</div></div>
     <div class="card"><div id="ephoto"></div><div class="ecap" id="ecap"></div></div>
@@ -563,7 +564,7 @@ function playLive(prev) {
     const el = $("#plist"); if (el) { const known = new Set($$("[data-pid]", el).map(x => x.dataset.pid)); el.innerHTML = s.players.map(p => `<span class="pl" data-pid="${esc(p.id)}" style="${known.has(p.id) ? "animation:none" : ""}">${avatar(p)}${esc(p.name)} <span>${ROLES[p.role]?.icon || ""}</span></span>`).join(""); }
     const ag = $("#avs"); if (ag) {
       const me = s.players.find(p => p.id === S.id), n = S.info?.avatars || 13;
-      if (!ag.children.length) { ag.innerHTML = Array.from({ length: n }, (_, i) => `<button class="avopt" data-a="${i + 1}" aria-label="Avatar ${i + 1}"><img src="img/caras/cara-${String(i + 1).padStart(2, "0")}.png" alt="" loading="lazy"></button>`).join(""); $$(".avopt", ag).forEach(b => b.onclick = async () => { beep(700, .06, "triangle"); const r = await post("/api/avatar", { ...creds(), avatar: +b.dataset.a }); if (!r.ok) toast(r.d.error === "taken" ? "Ese avatar ya lo eligió alguien más." : "No se pudo cambiar el avatar."); }); }
+      if (!ag.children.length) { ag.innerHTML = Array.from({ length: n }, (_, i) => `<button class="avopt" data-a="${i + 1}" aria-label="Avatar ${i + 1}"><img src="${A("img/caras/cara-" + String(i + 1).padStart(2, "0") + ".png")}" alt="" loading="lazy"></button>`).join(""); $$(".avopt", ag).forEach(b => b.onclick = async () => { beep(700, .06, "triangle"); const r = await post("/api/avatar", { ...creds(), avatar: +b.dataset.a }); if (!r.ok) toast(r.d.error === "taken" ? "Ese avatar ya lo eligió alguien más." : "No se pudo cambiar el avatar."); }); }
       $$(".avopt", ag).forEach(b => { const a = +b.dataset.a, owner = s.players.find(p => p.avatar === a); b.classList.toggle("sel", me?.avatar === a); b.disabled = !!owner && owner.id !== S.id; b.title = owner && owner.id !== S.id ? "Elegido por " + owner.name : ""; });
     }
     const rl = $("#roles"); if (rl) {

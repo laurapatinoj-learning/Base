@@ -4,6 +4,10 @@
  * Genera la versión estática del juego para GitHub Pages (o cualquier hosting de archivos).
  *
  *   KMS_API_URL=https://kms-movies.onrender.com node build-static.js dist
+ *   KMS_API_URL=https://kms-movies.onrender.com node build-static.js kms-movies.html --single
+ *
+ * Con --single todo queda en un solo archivo .html (CSS, JavaScript e imágenes incrustados).
+ * Los videos no se incluyen: sin ellos se usan las animaciones de respaldo.
  *
  * Resultado en la carpeta de salida:
  *   index.html   página única con el CSS y todo el JavaScript dentro
@@ -15,9 +19,25 @@
 const fs = require("fs");
 const path = require("path");
 
-const out = path.resolve(process.argv[2] || "dist");
+const single = process.argv.includes("--single");
+const out = path.resolve(process.argv.find((a, i) => i >= 2 && !a.startsWith("--")) || (single ? "kms-movies.html" : "dist"));
 const api = (process.env.KMS_API_URL || "").trim().replace(/\/+$/, "");
 const src = path.join(__dirname, "public");
+
+const walk = (d, base = "") => fs.readdirSync(d, { withFileTypes: true }).flatMap(e => e.isDirectory() ? walk(path.join(d, e.name), base + e.name + "/") : [base + e.name]);
+const MIME = { ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp", ".svg": "image/svg+xml" };
+
+if (single) {
+  let html = fs.readFileSync(path.join(src, "index.html"), "utf8");
+  const assets = {};
+  for (const f of walk(path.join(src, "img"))) assets["img/" + f] = `data:${MIME[path.extname(f).toLowerCase()] || "application/octet-stream"};base64,` + fs.readFileSync(path.join(src, "img", f)).toString("base64");
+  const inline = (tag, code) => { if (!html.includes(tag)) throw new Error("No encuentro " + tag); html = html.replace(tag, () => `<script>\n${code.replace(/<\/script/gi, "<\\/script")}\n</script>`); };
+  inline('<script src="config.js"></script>', `/* Dirección del servidor del juego (Render). Edita api si cambias de servidor. */\nwindow.KMS_CONFIG = { api: ${JSON.stringify(api)} };\nwindow.KMS_ASSETS = ${JSON.stringify(assets)};`);
+  for (const f of ["team.js", "minigames.js", "app.js"]) inline(`<script src="${f}"></script>`, fs.readFileSync(path.join(src, f), "utf8"));
+  fs.writeFileSync(out, html);
+  console.log(`Listo: ${out} (${(fs.statSync(out).size / 1048576).toFixed(1)} MB). API: ${api || "(vacía: edita window.KMS_CONFIG.api dentro del archivo)"}`);
+  process.exit(0);
+}
 
 fs.rmSync(out, { recursive: true, force: true });
 fs.mkdirSync(out, { recursive: true });
