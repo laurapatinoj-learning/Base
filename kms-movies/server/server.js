@@ -31,7 +31,7 @@ const ROLES = ["director", "guionista", "productor", "doble", "compositor"];
 const MGS = [
   { id: "tap", base: 5500 }, { id: "catch", base: 6500 }, { id: "swipe", base: 4000 }, { id: "timing", base: 4500 },
   { id: "dodge", base: 6000 }, { id: "odd", base: 5500 }, { id: "alt", base: 5500 }, { id: "memory", base: 7500 },
-  { id: "count", base: 6000 }, { id: "sum", base: 5500 }
+  { id: "count", base: 6000 }, { id: "sum", base: 5500 }, { id: "find", base: 6500 }, { id: "snap", base: 6500 }
 ];
 const BOSSES = [{ id: "teamtap", base: 10000 }, { id: "teamalt", base: 10000 }];
 
@@ -141,7 +141,7 @@ function resetRoom(room) {
   clearT(room);
   Object.assign(room, {
     phase: "lobby", idx: -1, film: null, pub: null, reveal: null, mg: null, mgres: null, qStart: 0, startsAt: 0, endsAt: 0, nextAt: 0,
-    hearts: START_HEARTS, shield: 0, score: 0, combo: 0, mgCount: 0, fan: false, hold: false, dead: false, win: false, hidden: [], awards: null, stars: 0
+    hearts: START_HEARTS, shield: 0, score: 0, combo: 0, mgCount: 0, fan: false, hold: false, dead: false, win: false, hidden: [], awards: null, stars: 0, spot: null, spotQ: []
   });
   room.plan = buildPlan(room.cfg.films, room.cfg.mode);
   room.players.forEach(p => Object.assign(p, { score: 0, ans: undefined, rt: 0, result: null, used: false, done: false, ok: false, prog: 0, wins: 0, rtSum: 0, rtN: 0, lastPts: 0 }));
@@ -151,7 +151,7 @@ function stateFor(room, viewer /* "host" | player */) {
   const st = {
     now: Date.now(), code: room.code, phase: room.phase, idx: room.idx, total: room.plan.length, film: room.film, endsAt: room.endsAt, startsAt: room.startsAt,
     max: MAX_PLAYERS, hearts: room.hearts, maxHearts: MAX_HEARTS, shield: room.shield, score: room.score, combo: room.combo, mult: mult(room), fan: room.fan,
-    hold: room.hold, nextAt: room.nextAt, item: room.plan[room.idx] ? { kind: room.plan[room.idx].kind, boss: !!room.plan[room.idx].boss, final: !!room.plan[room.idx].final } : null,
+    hold: room.hold, nextAt: room.nextAt, spot: ["q", "reveal", "mg", "mgres"].includes(room.phase) ? room.spot : null, item: room.plan[room.idx] ? { kind: room.plan[room.idx].kind, boss: !!room.plan[room.idx].boss, final: !!room.plan[room.idx].final } : null,
     q: room.phase === "q" || room.phase === "reveal" ? { ...room.pub, hidden: room.hidden } : null,
     reveal: room.phase === "reveal" ? room.reveal : null,
     mg: room.phase === "mg" || room.phase === "mgres" ? { ...room.mg, prog: totalProg(room) } : null,
@@ -176,6 +176,13 @@ function broadcast(room, event, data) { room.hostRes.forEach(r => send(r, event,
 const clearT = room => { clearTimeout(room.timer); clearTimeout(room.early); room.timer = room.early = null; };
 const later = (room, ms, fn) => { clearTimeout(room.timer); room.timer = setTimeout(fn, ms); };
 
+/** El foco rota entre los jugadores: su resultado vale doble para el equipo. */
+function pickSpot(room) {
+  const ids = [...room.players.keys()];
+  room.spotQ = room.spotQ.filter(id => room.players.has(id));
+  if (!room.spotQ.length) room.spotQ = shuffle(ids);
+  room.spot = room.spotQ.shift() || null;
+}
 /** Resta una vida al equipo; el escudo del Productor la absorbe. */
 function loseHeart(room) {
   if (room.shield > 0) { room.shield--; return { shieldUsed: true, heartLost: false }; }
@@ -209,7 +216,7 @@ function openItem(room) { const it = room.plan[room.idx]; if (it.kind === "q") o
 /* ---- preguntas ---- */
 function openQuestion(room, it) {
   clearT(room); const q = BY_ID[it.id];
-  room.pub = publicQ(q, room.idx); room.hidden = [];
+  room.pub = publicQ(q, room.idx); room.hidden = []; pickSpot(room);
   room.players.forEach(p => { p.ans = undefined; p.result = null; p.lastPts = 0; });
   room.phase = "q"; room.qStart = Date.now(); room.endsAt = room.qStart + q.dur * 1000;
   push(room); later(room, q.dur * 1000 + 400, () => reveal(room));
@@ -224,9 +231,9 @@ function reveal(room) {
   clearT(room);
   const q = BY_ID[room.pub.id], pub = room.pub, n = room.players.size;
   const dist = pub.opts && q.type !== "order" ? pub.opts.map(() => 0) : pub.imgs ? pub.imgs.map(() => 0) : null;
-  let right = 0, answered = 0, sum = 0, nn = 0, raw = 0, fsum = 0;
+  let right = 0, answered = 0, sum = 0, nn = 0, raw = 0, fsum = 0, wsum = 0, fastest = null;
   room.players.forEach(p => {
-    p.lastPts = 0;
+    p.lastPts = 0; const w = p.id === room.spot ? 2 : 1; wsum += w;
     if (p.ans === undefined) { p.result = { ok: -1, pts: 0, f: 0 }; return; }
     answered++;
     if (dist) { if (Array.isArray(p.ans)) { if (q.type === "multi") p.ans.forEach(i => dist[i]++); } else if (dist[p.ans] !== undefined) dist[p.ans]++; }
@@ -234,15 +241,15 @@ function reveal(room) {
     const f = grade(q, pub, p.ans), full = f >= 0.99;
     const rt = Math.min(Math.max(p.rt, 0), pub.dur * 1000);
     const pts = Math.round(Math.round(1000 * (1 - (rt / (pub.dur * 1000)) / 2)) * f);
-    fsum += f; if (full) right++;
-    raw += pts; p.lastPts = pts; p.rtSum += rt; p.rtN++;
+    fsum += f * w; if (full) { right++; if (!fastest || rt < fastest.rt) fastest = { id: p.id, rt }; }
+    raw += pts * w; p.lastPts = pts; p.rtSum += rt; p.rtN++;
     p.result = { ok: full ? 1 : f > 0 ? 0.5 : 0, pts, f: Math.round(f * 100) };
   });
-  const teamF = n ? fsum / n : 0, pass = teamF >= 0.5, m = mult(room);
+  const teamF = wsum ? fsum / wsum : 0, pass = teamF >= 0.5, m = mult(room);
   let gain = 0, loss = { shieldUsed: false, heartLost: false };
   if (pass) { gain = Math.round(raw * m); room.score += gain; room.players.forEach(p => { p.score += p.lastPts; }); room.combo++; room.fan = false; }
   else { room.combo = 0; loss = loseHeart(room); }
-  room.reveal = { total: n, answered, right, dist, avg: nn ? Math.round(sum / nn) : null, ctext: answerText(q), expl: q.expl || "", correct: correctView(q, pub), team: { pass, pct: Math.round(teamF * 100), gain, mult: Math.round(m * 10) / 10, ...loss } };
+  room.reveal = { total: n, answered, right, dist, avg: nn ? Math.round(sum / nn) : null, ctext: answerText(q), expl: q.expl || "", correct: correctView(q, pub), fastest, spot: room.spot ? { id: room.spot, f: room.players.get(room.spot)?.result?.f ?? 0 } : null, team: { pass, pct: Math.round(teamF * 100), gain, mult: Math.round(m * 10) / 10, ...loss } };
   room.phase = "reveal"; room.endsAt = 0;
   push(room); scheduleNext(room, 7500);
 }
@@ -255,6 +262,7 @@ function openMg(room, it) {
   const per = it.final ? 22 : 12 + Math.min(level, 8);
   room.mg = { id: it.mg, level, dur, boss: !!it.boss, final: !!it.final, goal: it.boss ? Math.ceil(n * per * 0.9) : 0, seed: Math.floor(Math.random() * 1e9) };
   room.players.forEach(p => { p.done = false; p.ok = false; p.prog = 0; });
+  if (it.boss) room.spot = null; else pickSpot(room);
   room.phase = "mg"; room.startsAt = Date.now() + 2300; room.endsAt = room.startsAt + dur;
   push(room); later(room, dur + 2300 + 700, () => finishMg(room));
 }
@@ -271,13 +279,14 @@ function finishMg(room) {
   if (mg.boss) {
     total = totalProg(room); pass = total >= mg.goal; raw = pass ? 1500 + total * 8 : total * 4;
   } else {
-    room.players.forEach(p => { if (p.ok) { succ++; const pts = Math.round(300 * (1 + 0.1 * mg.level)); p.score += pts; p.wins++; p.lastPts = pts; raw += pts; } });
-    pass = n > 0 && succ / n >= 0.5;
+    let wOk = 0, wAll = 0;
+    room.players.forEach(p => { const w = p.id === room.spot ? 2 : 1; wAll += w; if (p.ok) { succ++; wOk += w; const pts = Math.round(300 * (1 + 0.1 * mg.level)); p.score += pts; p.wins++; p.lastPts = pts; raw += pts * w; } });
+    pass = wAll > 0 && wOk / wAll >= 0.5;
   }
   let gain = 0, loss = { shieldUsed: false, heartLost: false };
   if (pass) { gain = Math.round(raw * m); room.score += gain; room.combo++; room.mgCount++; room.fan = false; if (mg.boss && room.hearts < MAX_HEARTS) { room.hearts++; bonusHeart = true; } if (mg.boss) room.players.forEach(p => { p.score += 400; p.wins++; }); }
   else { room.combo = 0; loss = loseHeart(room); }
-  room.mgres = { pass, succ, n, total, goal: mg.goal, boss: mg.boss, gain, mult: Math.round(m * 10) / 10, bonusHeart, ...loss };
+  room.mgres = { spot: room.spot ? { id: room.spot, ok: !!room.players.get(room.spot)?.ok } : null, pass, succ, n, total, goal: mg.goal, boss: mg.boss, gain, mult: Math.round(m * 10) / 10, bonusHeart, ...loss };
   room.phase = "mgres"; room.endsAt = 0;
   push(room); scheduleNext(room, 4800);
 }
@@ -355,7 +364,7 @@ async function api(req, res, url) {
     const base = name; let k = 2; while (names.has(name.toLowerCase())) name = base.slice(0, 12) + " " + k++;
     const used = new Set([...room.players.values()].map(p => p.color)), rc = roleCount(room);
     const role = ROLES.slice().sort((a, c) => rc[a] - rc[c])[0];
-    const fa = freeAvatars(room), avatar = fa.length ? pick(fa) : null;
+    const fa = freeAvatars(room), pref = Number.isInteger(b.avatar) && fa.includes(b.avatar) ? b.avatar : null, avatar = pref || (fa.length ? pick(fa) : null);
     const p = { id: rid(6), token: rid(), name, avatar, color: COLORS.find(c => !used.has(c)) || COLORS[room.players.size % COLORS.length], role, used: false, score: 0, res: new Set(), ans: undefined, rt: 0, result: null, done: false, ok: false, prog: 0, wins: 0, rtSum: 0, rtN: 0, lastPts: 0 };
     room.players.set(p.id, p); push(room);
     return json(res, 200, { id: p.id, token: p.token, name, color: p.color, role, avatar });
@@ -416,7 +425,7 @@ async function api(req, res, url) {
     if (now - (lastReact.get(who) || 0) < 350) return json(res, 429, { error: "slow" });
     lastReact.set(who, now);
     const emoji = ["😂", "🔥", "👏", "😮", "🍿", "🎬", "😎", "❤️"].includes(b.emoji) ? b.emoji : null; if (!emoji) return json(res, 400, { error: "emoji" });
-    broadcast(room, "react", { emoji, name: o?.p.name || "Organizador", color: o?.p.color || "#ffc21a", x: Math.random() });
+    broadcast(room, "react", { id: o?.p.id || null, emoji, name: o?.p.name || "Organizador", color: o?.p.color || "#ffc21a", x: Math.random() });
     return json(res, 200, { ok: true });
   }
   if (route === "/api/host/action") {

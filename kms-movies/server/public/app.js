@@ -18,6 +18,7 @@ const FILMS = { poeta: { name: "El Poeta", color: "#ff3b8d" }, contador: { name:
 const filmColor = k => FILMCOL[k] || "#ffc21a";
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const S = { role: null, code: null, token: null, id: null, name: null, mute: false, info: null, lastHearts: null };
+var HP = null, PP = null, EP = null;
 let ST = null, skew = 0, es = null, renderedKey = "", rafT = 0, PQ = {}, stingerEl = null, MGCTL = null, nxIv = 0;
 const sess = { get(k) { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch (e) { return null; } }, set(k, v) { try { v ? localStorage.setItem(k, JSON.stringify(v)) : localStorage.removeItem(k); } catch (e) {} } };
 const post = (p, b) => fetch(p, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(b || {}) }).then(async r => ({ ok: r.ok, status: r.status, d: await r.json().catch(() => ({})) })).catch(() => ({ ok: false, status: 0, d: {} }));
@@ -118,7 +119,7 @@ function connect() {
   es.onerror = () => { if (es.readyState === EventSource.CLOSED) leave("No se pudo conectar con la sala. Puede que ya haya terminado."); };
 }
 function leave(msg) {
-  es?.close(); es = null; sess.set(S.role === "host" ? "kms-host" : "kms-play", null); ST = null; renderedKey = ""; S.code = S.token = S.id = null; S.lastHearts = null; stopTimer(); removeStinger(); $("#dock").hidden = true;
+  es?.close(); es = null; sess.set(S.role === "host" ? "kms-host" : "kms-play", null); ST = null; renderedKey = ""; S.code = S.token = S.id = null; S.lastHearts = null; stopTimer(); removeStinger(); $("#dock").hidden = true; $("#teamBar")?.remove(); document.body.classList.remove("hasbar");
   S.role = null; landing(); if (msg) toast(msg);
 }
 function onState(s) {
@@ -164,7 +165,7 @@ function showAbility(a) {
 function view(html, cls = "") {
   stopTimer(); document.body.classList.remove("hot"); speed = 1; app.className = "wrap screen " + cls;
   const hud = ST && S.role && ["q", "reveal", "mg", "mgres"].includes(ST.phase);
-  app.innerHTML = (hud ? hudHTML() : "") + (hud && S.role === "play" ? abilityHTML() : "") + html;
+  app.innerHTML = (hud ? hudHTML() : "") + (hud && S.role === "play" ? abilityHTML() : "") + (hud ? spotHTML() : "") + html;
   if (hud) S.lastHearts = ST.hearts;
   if (hud && S.role === "play") bindAbility();
   window.scrollTo({ top: 0 });
@@ -174,7 +175,10 @@ function view(html, cls = "") {
 const REACTS = ["😂", "🔥", "👏", "😮", "🍿", "🎬", "😎", "❤️"];
 function mountDock() { const d = $("#dock"); d.hidden = false; if (d.dataset.ok) return; d.dataset.ok = 1; d.innerHTML = REACTS.map(e => `<button aria-label="Reaccionar ${e}">${e}</button>`).join(""); $$("button", d).forEach((b, i) => b.onclick = () => { beep(600 + i * 60, .06, "triangle", .03); post("/api/react", S.role === "host" ? { code: S.code, token: S.token, emoji: REACTS[i] } : { ...creds(), emoji: REACTS[i] }); }); }
 function showReaction(r) {
-  const d = document.createElement("div"); d.className = "react"; d.style.left = (6 + r.x * 84) + "%"; d.style.setProperty("--dx", (Math.random() - .5) * 120 + "px");
+  const d = document.createElement("div"); d.className = "react"; d.style.setProperty("--dx", (Math.random() - .5) * 120 + "px");
+  const face = r.id && S.role === "host" ? $(`#teamBar [data-pid="${CSS.escape(r.id)}"]`) : null;
+  if (face) { const b = face.getBoundingClientRect(); d.style.left = b.left + b.width / 2 - 20 + "px"; d.style.bottom = innerHeight - b.top - 10 + "px"; face.animate?.([{ transform: "translateY(0)" }, { transform: "translateY(-12px) scale(1.15)" }, { transform: "translateY(0)" }], { duration: 350 }); }
+  else d.style.left = (6 + r.x * 84) + "%";
   d.innerHTML = `${esc(r.emoji)}<small style="color:${esc(r.color)}">${esc(r.name)}</small>`; document.body.appendChild(d); setTimeout(() => d.remove(), 3700);
 }
 function removeStinger() { stingerEl?.remove(); stingerEl = null; }
@@ -195,6 +199,7 @@ function landing() {
   const pin = new URLSearchParams(location.search).get("pin") || "";
   view(`
     <div class="logo"><div class="kms" aria-label="KMS"><span>K</span><span>M</span><span>S</span></div><span class="marquee">GET IT TOGETHER · TRIVIA EN EQUIPO</span></div>
+    <div id="lphoto"></div>
     <div class="role-grid">
       <button class="role host" id="goHost"><h2>Organizar</h2><p>Crea la sala, comparte el PIN y dirige la función desde la pantalla grande.</p></button>
       <button class="role play" id="goPlay"><h2>Jugar</h2><p>Entra con el PIN, elige tu personaje y ayuda al equipo con preguntas y microjuegos.</p></button>
@@ -202,6 +207,7 @@ function landing() {
     <div class="posters">${[["poeta", "El Poeta", "Colombia · 2025"], ["contador", "El Contador", "Ben Affleck · 2016"], ["tropic", "Tropic Thunder", "Dir. Ben Stiller · 2008"]].map(([k, n, s]) => `<div class="poster" style="--c:${FILMCOL[k]};background-image:url(/img/${k}.jpg)"><div><b>${n}</b><span>${s}</span></div></div>`).join("")}</div>`);
   $("#goHost").onclick = () => { beep(523, .1); location.hash = "host"; hostEntry(); };
   $("#goPlay").onclick = () => { beep(784, .1); location.hash = ""; joinScreen(pin); };
+  TEAM.create($("#lphoto"), { mode: "landing", scroll: innerWidth < 760, onPick: n => { S.prefAvatar = n; beep(784, .1, "triangle"); jingle(true); joinScreen(pin); } });
   if (pin) joinScreen(pin);
 }
 
@@ -241,13 +247,61 @@ function render(prev) {
   const s = ST; if (!s) return;
   mountDock(); $("#dock").hidden = ["q", "film", "mg"].includes(s.phase);
   if (S.role === "host") hostRender(prev); else playRender(prev);
+  syncTeamBar(); if (["q", "mg"].includes(s.phase) && s.spot) spotToast();
 }
 function live(prev) {
-  updateHud();
+  updateHud(); syncTeamBar();
   if (ST.phase === "q") { applyHidden(); updateLights(); }
   if (ST.phase === "mg") updateMgLive();
   if (S.role === "host") hostLive(prev); else playLive(prev);
   if (S.role === "play" && ["q", "reveal", "mg", "mgres"].includes(ST.phase)) { const b = $("#ab"); if (b) { b.disabled = !!ST.me?.used; const sm = $("small", b); if (sm && ST.me?.used) sm.textContent = "Ya la usaste"; } }
+}
+/* ---- barra del equipo (organizador): caras con estado en vivo ---- */
+function syncTeamBar() {
+  let bar = $("#teamBar"); const show = S.role === "host" && ST && ["q", "reveal", "mg", "mgres"].includes(ST.phase);
+  document.body.classList.toggle("hasbar", !!show);
+  if (!show) { bar?.remove(); return; }
+  if (!bar) { bar = document.createElement("div"); bar.id = "teamBar"; bar.className = "teambar2"; bar.setAttribute("aria-label", "Estado del equipo"); document.body.appendChild(bar); }
+  const key = ST.players.map(p => [p.id, p.avatar, p.role].join(":")).join("|");
+  if (bar.dataset.key !== key) { bar.dataset.key = key; bar.innerHTML = ST.players.map(p => `<div class="tb" data-pid="${esc(p.id)}">${avatar(p)}<span class="tbrole">${ROLES[p.role]?.icon || ""}</span><span class="tbmark"></span><span class="tbname">${esc(p.name)}</span></div>`).join(""); }
+  const mg = ST.phase === "mg" || ST.phase === "mgres", boss = !!ST.mg?.boss;
+  $$(".tb", bar).forEach(el => {
+    const p = ST.players.find(x => x.id === el.dataset.pid); if (!p) return;
+    const ans = ST.phase === "q" || ST.phase === "reveal" ? p.answered : false;
+    const ok = mg && (boss ? ST.phase === "mgres" : p.done && p.ok), no = mg && !boss && p.done && !p.ok || (ST.phase === "mgres" && !boss && !p.ok);
+    const was = el.classList.contains("ok");
+    el.classList.toggle("spot", ST.spot === p.id && ["q", "mg"].includes(ST.phase)); el.classList.toggle("ans", ans); el.classList.toggle("ok", !!ok); el.classList.toggle("no", !!no);
+    if (ok && !was) { el.classList.remove("ok"); void el.offsetWidth; el.classList.add("ok"); }
+    el.querySelector(".tbmark").textContent = ans || ok ? "✓" : no ? "✗" : "";
+  });
+}
+function spotHTML() {
+  const s = ST; if (!s.spot || !["q", "mg"].includes(s.phase)) return "";
+  const p = s.players.find(x => x.id === s.spot); if (!p) return "";
+  const mine = S.role === "play" && p.id === S.id;
+  return `<div class="spotbar ${mine ? "me" : ""}">${avatar(p)}<div><b>${mine ? "¡Estás en el foco!" : "En el foco: " + esc(p.name)}</b><small>${s.phase === "q" ? "Su respuesta vale doble" : "Su resultado vale doble"}</small></div></div>`;
+}
+function spotToast() {
+  const s = ST, p = s.players.find(x => x.id === s.spot); if (!p) return;
+  const d = document.createElement("div"); d.className = "abanner spot"; d.style.setProperty("--c", "var(--amber)");
+  d.innerHTML = `${avatar(p)}<div><b>${S.role === "play" && p.id === S.id ? "¡Estás en el foco!" : "El foco está en " + esc(p.name)}</b><small>Su ${s.phase === "q" ? "respuesta" : "resultado"} vale doble</small></div>`;
+  document.body.appendChild(d); beep(880, .1, "triangle", .05); setTimeout(() => d.remove(), 2400);
+}
+function fastestHTML(rv) {
+  const f = rv.fastest && ST.players.find(p => p.id === rv.fastest.id); if (!f) return "";
+  return `<div class="fastest">${avatar(f)}<div><small>⚡ Más rápido en acertar</small><b>${esc(f.name)}</b> <span class="mut">${(rv.fastest.rt / 1000).toFixed(1)} s</span></div></div>`;
+}
+/* premios finales: la cámara hace zoom a cada ganador en la foto */
+function awardsCycle(s) {
+  const ph = $("#ephoto"); if (!ph) return;
+  EP = TEAM.create(ph, { mode: "show" }); EP.update(s.players, null);
+  const aw = (s.awards || []).filter(a => a.avatar), cap = $("#ecap"); let k = 0;
+  const tick = () => {
+    if (!ph.isConnected) return;
+    if (k < aw.length) { const a = aw[k++]; EP.spot(a.avatar); cap.innerHTML = `<small>${esc(a.title)}</small><b>${esc(a.name)}</b> <span class="mut">${esc(a.note)}</span>`; beep(660 + k * 120, .12, "triangle", .05); setTimeout(tick, 3400); }
+    else { EP.spot(null); cap.innerHTML = `<small>Todo el equipo</small><b>¡Gracias por jugar!</b>`; setTimeout(() => { k = 0; tick(); }, 3000); }
+  };
+  setTimeout(tick, 1400);
 }
 const stateTxt = s => `Escena ${s.idx + 1} de ${s.total}`;
 
@@ -273,6 +327,7 @@ function hostLobby() {
       </div>
       <video class="vid" id="intro" src="/media/intro.mp4" muted playsinline loop autoplay controls></video>
     </div>
+    <div class="card"><h2 style="font-size:1.6rem;margin-bottom:10px">La foto del equipo</h2><div id="hphoto"></div></div>
     <div class="card"><div class="top"><h2 style="font-size:1.6rem">El equipo <span id="pc" class="mut"></span></h2><span class="mut">${s.total} escenas · ${s.maxHearts - 1} vidas al inicio</span></div><div id="plist" class="players" style="margin-top:12px"></div></div>
     <div class="row center"><button class="btn big pink" id="start" disabled>Levantar el telón</button></div><div class="gap-dock"></div>`);
   $("#mute").onclick = e => { S.mute = !S.mute; e.target.textContent = S.mute ? "Sonido: no" : "Sonido: sí"; };
@@ -292,7 +347,7 @@ function hostLobby() {
       } catch (e) { /* sin QR */ }
     } else if (!window.__noqr && qrTries++ < 20) setTimeout(tryQR, 400);
   };
-  tryQR(); $("#intro").play?.().catch(() => {}); hostLive(null);
+  tryQR(); $("#intro").play?.().catch(() => {}); HP = TEAM.create($("#hphoto"), { mode: "show" }); hostLive(null);
 }
 function hostLive(prev) {
   const s = ST;
@@ -301,6 +356,7 @@ function hostLive(prev) {
     const known = new Set($$("[data-pid]", el).map(x => x.dataset.pid));
     el.innerHTML = s.players.length ? s.players.map(p => `<span class="pl ${p.on ? "" : "off"}" data-pid="${esc(p.id)}" style="${known.has(p.id) ? "animation:none" : ""}">${avatar(p)}${esc(p.name)} <span title="${esc(ROLES[p.role]?.name)}">${ROLES[p.role]?.icon || ""}</span><button data-k="${esc(p.id)}" aria-label="Quitar a ${esc(p.name)}">×</button></span>`).join("") : `<span class="mut">Esperando a los primeros jugadores…</span>`;
     if (prev && s.players.length > (prev.players?.length || 0)) beep(784, .1, "triangle", .05);
+    HP?.update(s.players, null);
     $("#pc").textContent = `${s.players.length}/${s.max}`; $("#start").disabled = !s.players.length;
     $$("[data-k]", el).forEach(b => b.onclick = () => hostAct("kick", { id: b.dataset.k }));
   } else if (s.phase === "q") {
@@ -353,14 +409,14 @@ function startQTimer() {
 function hostQuestion() {
   const q = ST.q;
   view(`${qHeader(q, true)}${qBody(q)}${optsHTML(q)}
-    <div class="lights" id="lights"></div>
     <div class="row center"><button class="btn ghost sm" id="plus">+10 s</button><button class="btn ghost sm" id="skip">Saltar tiempo</button></div>`);
   $("#plus").onclick = () => hostAct("extend"); $("#skip").onclick = () => hostAct("skip");
   startQTimer(); updateLights(); hostLive(null);
 }
-function teamBanner(t) {
+function teamBanner(t, spot) {
   const note = t.shieldUsed ? `<div class="flame">🛡️ El seguro absorbió el golpe</div>` : t.heartLost ? `<div class="flame">💔 −1 vida</div>` : "";
-  return `<div class="res-hero ${t.pass ? "ok" : "bad"}"><h2>${t.pass ? "¡EL EQUIPO LO LOGRA!" : "¡EL EQUIPO FALLA!"}</h2><div>${t.pct}% de acierto del equipo${t.pass ? "" : " · hacía falta 50%"}</div>${t.pass ? `<div class="pts">+<span id="pp">0</span></div>${t.mult > 1 ? `<span class="chip">combo ×${t.mult}</span>` : ""}` : ""}${note}</div>`;
+  const sp = spot && ST.players.find(p => p.id === spot.id), spotTxt = sp ? `<div class="flame">${avatar(sp)} En el foco: ${esc(sp.name)} · ${spot.f}% · vale doble</div>` : "";
+  return `<div class="res-hero ${t.pass ? "ok" : "bad"}"><h2>${t.pass ? "¡EL EQUIPO LO LOGRA!" : "¡EL EQUIPO FALLA!"}</h2><div>${t.pct}% de acierto del equipo${t.pass ? "" : " · hacía falta 50%"}</div>${t.pass ? `<div class="pts">+<span id="pp">0</span></div>${t.mult > 1 ? `<span class="chip">combo ×${t.mult}</span>` : ""}` : ""}${spotTxt}${note}</div>`;
 }
 function nextControls() {
   const s = ST;
@@ -374,7 +430,7 @@ function bindNext() {
 function hostReveal() {
   const s = ST, q = s.q, rv = s.reveal;
   view(`<div class="top"><div class="row">${filmChip(FILMS[q.film])}<span class="chip dark">${stateTxt(s)}</span></div><span class="chip" id="stat">${rv.right} de ${rv.total} acertaron</span></div>
-    ${teamBanner(rv.team)}${qBody(q)}${optsHTML(q, rv)}
+    ${teamBanner(rv.team, rv.spot)}${fastestHTML(rv)}${qBody(q)}${optsHTML(q, rv)}
     <div class="card"><div class="mut">Respuesta correcta</div><div style="font-family:var(--font-display);font-size:1.7rem;overflow-wrap:anywhere">${esc(rv.ctext)}</div><p class="mut" style="margin:6px 0 0">${esc(rv.expl)}</p></div>
     ${nextControls()}`);
   bindNext(); countUp($("#pp"), 0, rv.team.gain, 1000);
@@ -409,7 +465,7 @@ function updateMgLive() {
 function bossBar() { return `<div class="teambar"><i id="tb"></i><span id="tbn"></span></div>`; }
 function hostMg() {
   const m = ST.mg;
-  view(`${mgHead()}${m.boss ? bossBar() : ""}<div class="lights big" id="mates">${matesHTML()}</div><div class="fuse" id="fuse"><i></i><u></u><b id="fusel"></b></div>
+  view(`${mgHead()}${m.boss ? bossBar() : ""}<div class="fuse" id="fuse"><i></i><u></u><b id="fusel"></b></div>
     <div class="row center"><button class="btn ghost sm" id="plus">+8 s</button><button class="btn ghost sm" id="skip">Saltar</button></div>`);
   $("#plus").onclick = () => hostAct("extend"); $("#skip").onclick = () => hostAct("skip");
   whoosh(); startMgLoop(); updateMgLive();
@@ -417,12 +473,13 @@ function hostMg() {
 function mgresBanner() {
   const r = ST.mgres;
   const note = r.bonusHeart ? `<div class="flame">❤️ +1 vida por vencer al jefe</div>` : r.shieldUsed ? `<div class="flame">🛡️ El seguro absorbió el golpe</div>` : r.heartLost ? `<div class="flame">💔 −1 vida</div>` : "";
+  const sp = r.spot && ST.players.find(p => p.id === r.spot.id), spotTxt = sp ? `<div class="flame">${avatar(sp)} En el foco: ${esc(sp.name)} ${r.spot.ok ? "lo logró" : "no lo logró"} · vale doble</div>` : "";
   return `<div class="res-hero ${r.pass ? "ok" : "bad"}"><h2>${r.pass ? (r.boss ? "¡JEFE DERROTADO!" : "¡EL EQUIPO LO LOGRA!") : (r.boss ? "¡EL JEFE GANA!" : "¡EL EQUIPO FALLA!")}</h2>
-    <div>${r.boss ? `${r.total} de ${r.goal} toques en equipo` : `${r.succ} de ${r.n} jugadores lo superaron`}</div>${r.pass ? `<div class="pts">+<span id="pp">0</span></div>${r.mult > 1 ? `<span class="chip">combo ×${r.mult}</span>` : ""}` : ""}${note}</div>`;
+    <div>${r.boss ? `${r.total} de ${r.goal} toques en equipo` : `${r.succ} de ${r.n} jugadores lo superaron`}</div>${r.pass ? `<div class="pts">+<span id="pp">0</span></div>${r.mult > 1 ? `<span class="chip">combo ×${r.mult}</span>` : ""}` : ""}${spotTxt}${note}</div>`;
 }
 function hostMgres() {
   const s = ST, m = s.mg;
-  view(`<div class="top"><div class="row">${filmChip(FILMS[s.film])}<span class="chip dark">${stateTxt(s)}</span></div></div>${mgresBanner()}<div class="lights big" id="mates">${matesHTML()}</div>${nextControls()}`);
+  view(`<div class="top"><div class="row">${filmChip(FILMS[s.film])}<span class="chip dark">${stateTxt(s)}</span></div></div>${mgresBanner()}${nextControls()}`);
   updateMgLive(); $$("#mates .av").forEach(a => { const p = s.players.find(x => x.id === a.dataset.pid); a.classList.toggle("on", m.boss || (p?.done && p.ok)); a.classList.toggle("no", !m.boss && !(p?.done && p.ok)); });
   bindNext(); countUp($("#pp"), 0, s.mgres.gain, 1000); jingle(s.mgres.pass); if (s.mgres.pass) confetti(s.mgres.boss ? 180 : 70, { x: innerWidth / 2, y: innerHeight * .3 });
 }
@@ -435,8 +492,10 @@ function hostEnd() {
   view(`${s.win ? `<video class="vid" src="/media/finale.mp4" autoplay muted playsinline style="max-height:34vh;object-fit:cover"></video>` : ""}
     <div class="res-hero ${s.win ? "ok" : "bad"}"><h1 style="font-size:clamp(2.2rem,8vw,4.5rem)">${s.win ? "¡FUNCIÓN COMPLETADA!" : "¡SE CORTÓ LA FUNCIÓN!"}</h1>${starsHTML(s.stars)}
       <div class="pts"><span id="pp">0</span> pts de equipo</div><div class="flame">${HEART.replace("<svg", '<svg style="fill:#ff3355"')} ${s.hearts} vidas restantes</div></div>
+    <div class="card"><div id="ephoto"></div><div class="ecap" id="ecap"></div></div>
     ${awardsHTML()}
     <div class="row center"><button class="btn big pink" id="again">Jugar otra vez</button><button class="btn ghost" id="closeroom">Cerrar sala</button></div><div class="gap-dock"></div>`);
+  awardsCycle(s);
   countUp($("#pp"), 0, s.score, 2000);
   if (s.win) { setTimeout(() => confetti(220), 600); setTimeout(() => confetti(120, { x: innerWidth * .2, y: innerHeight * .7 }), 1300); setTimeout(() => confetti(120, { x: innerWidth * .8, y: innerHeight * .7 }), 1600); }
   jingle(s.win);
@@ -452,20 +511,22 @@ function joinScreen(pin, err) {
   view(`<div class="logo"><div class="kms" style="font-size:clamp(3.4rem,18vw,6rem)"><span>K</span><span>M</span><span>S</span></div></div>
     <div class="card narrow" style="display:grid;gap:16px">
       <h1 style="font-size:2rem;text-align:center">Únete al equipo</h1>
+      ${S.prefAvatar ? `<div class="pref"><span class="face">${TEAM.faceSVG(S.prefAvatar)}</span><span>Entrarás con esta cara <button id="clrAv" type="button">Cambiar</button></span></div>` : ""}
       <label class="lbl"><span>PIN de la sala</span><input class="field" id="pin" inputmode="numeric" maxlength="6" placeholder="000000" autocomplete="off" value="${esc(pin || "")}"></label>
       <label class="lbl"><span>Tu apodo</span><input class="field" id="nick" maxlength="14" placeholder="Ej. Cinéfilo" autocomplete="off" value="${esc(nick)}"></label>
       ${err ? `<div class="err">${esc(err)}</div>` : ""}
       <button class="btn big pink" id="join">Entrar</button><button class="btn ghost sm" id="home">Inicio</button></div>`);
   $("#home").onclick = () => { S.role = null; landing(); };
+  $("#clrAv")?.addEventListener("click", () => { S.prefAvatar = null; landing(); });
   const go = async () => {
     const code = $("#pin").value.trim(), name = $("#nick").value.trim();
     if (!/^\d{6}$/.test(code)) return joinScreen(code, "El PIN tiene 6 dígitos.");
     if (name.length < 2) return joinScreen(code, "Escribe un apodo de al menos 2 letras.");
     $("#join").disabled = true;
-    const r = await post("/api/join", { code, name });
+    const r = await post("/api/join", { code, name, avatar: S.prefAvatar || undefined });
     if (!r.ok) return joinScreen(code, { no_room: "No existe una sala con ese PIN.", started: "La función ya empezó.", full: "La sala está llena (15 jugadores).", name: "Apodo no válido." }[r.d.error] || "No se pudo entrar. Inténtalo otra vez.");
     try { localStorage.setItem("kms-nick", name); } catch (e) {}
-    S.code = code; S.id = r.d.id; S.token = r.d.token; S.name = r.d.name; sess.set("kms-play", { code, id: S.id, token: S.token, name: S.name }); beep(784, .1, "triangle"); connect();
+    S.prefAvatar = null; S.code = code; S.id = r.d.id; S.token = r.d.token; S.name = r.d.name; sess.set("kms-play", { code, id: S.id, token: S.token, name: S.name }); beep(784, .1, "triangle"); connect();
   };
   $("#join").onclick = go; $$(".field").forEach(f => f.onkeydown = e => { if (e.key === "Enter") go(); });
 }
@@ -483,14 +544,17 @@ async function playLobbyInfo() { if (!S.info) S.info = await fetch("/api/info").
 function playLobby() {
   playLobbyInfo();
   view(`<div class="logo"><div class="kms" style="font-size:clamp(3.4rem,18vw,6rem)"><span>K</span><span>M</span><span>S</span></div></div>
-    <div class="card"><h2 style="font-size:1.6rem;text-align:center">Elige tu avatar</h2><p class="mut" style="margin:6px 0 12px;text-align:center">Cada cara la puede usar una sola persona.</p><div class="avgrid" id="avs"></div></div>
+    <div class="card"><h2 style="font-size:1.6rem;text-align:center">Elige tu cara</h2><p class="mut" style="margin:6px 0 12px;text-align:center">Toca tu cara en la foto. Cada cara la usa una sola persona.</p><div id="pphoto"></div><div class="row center" style="margin-top:10px"><button class="btn sm" id="avToggle">Ver lista de caras</button></div><div class="avgrid" id="avs" hidden style="margin-top:10px"></div></div>
     <div class="card"><h2 style="font-size:1.6rem;text-align:center">Elige tu personaje</h2><p class="mut center" style="margin:6px 0 12px;text-align:center">Cada uno tiene una habilidad que puedes usar una vez para ayudar al equipo.</p><div class="roles" id="roles"></div></div>
     <div class="card"><div class="top"><h2 style="font-size:1.3rem">El equipo</h2><span class="mut" id="wc"></span></div><div class="players" id="plist" style="margin-top:10px"></div></div><div class="gap-dock"></div>`);
+  PP = TEAM.create($("#pphoto"), { mode: "pick", scroll: innerWidth < 760, onPick: async n => { beep(700, .06, "triangle"); const r = await post("/api/avatar", { ...creds(), avatar: n }); if (!r.ok) toast(r.d.error === "taken" ? "Ese avatar ya lo eligió alguien más." : "No se pudo cambiar el avatar."); } });
+  $("#avToggle").onclick = e => { const g = $("#avs"), photo = $("#pphoto"); g.hidden = !g.hidden; photo.hidden = !g.hidden; e.target.textContent = g.hidden ? "Ver lista de caras" : "Ver foto"; };
   playLive(null);
 }
 function playLive(prev) {
   const s = ST;
   if (s.phase === "lobby") {
+    PP?.update(s.players, S.id);
     const wc = $("#wc"); if (wc) wc.textContent = `${s.players.length} jugador${s.players.length === 1 ? "" : "es"}`;
     const el = $("#plist"); if (el) { const known = new Set($$("[data-pid]", el).map(x => x.dataset.pid)); el.innerHTML = s.players.map(p => `<span class="pl" data-pid="${esc(p.id)}" style="${known.has(p.id) ? "animation:none" : ""}">${avatar(p)}${esc(p.name)} <span>${ROLES[p.role]?.icon || ""}</span></span>`).join(""); }
     const ag = $("#avs"); if (ag) {
@@ -590,7 +654,7 @@ function playResult() {
   const s = ST, rv = s.reveal, r = s.me?.result, t = rv.team;
   let cls = "none", h = "Sin respuesta", sub = "No alcanzaste a responder.";
   if (r) { if (r.ok === 1) { cls = "ok"; h = "¡Acertaste!"; sub = "Aportaste al equipo"; } else if (r.ok === 0.5) { cls = "part"; h = "¡Casi!"; sub = `Acertaste el ${r.f}%.`; } else if (r.ok === 0) { cls = "bad"; h = "Esta vez no"; sub = "El equipo cuenta contigo en la siguiente."; } }
-  view(`${teamBanner(t)}<div class="res-hero ${cls}" style="padding:16px"><h2 style="font-size:1.8rem">${h}</h2><div>${sub}</div>${r ? `<div class="pts" style="font-size:2rem">+${r.pts}</div>` : ""}</div>
+  view(`${teamBanner(t, rv.spot)}<div class="res-hero ${cls}" style="padding:16px"><h2 style="font-size:1.8rem">${h}</h2><div>${sub}</div>${r ? `<div class="pts" style="font-size:2rem">+${r.pts}</div>` : ""}</div>
     <div class="card"><div class="mut">Respuesta correcta</div><div style="font-family:var(--font-display);font-size:1.5rem;overflow-wrap:anywhere">${esc(rv.ctext)}</div><p class="mut" style="margin:6px 0 0">${esc(rv.expl)}</p></div><div class="gap-dock"></div>`);
   countUp($("#pp"), 0, t.gain, 900);
   jingle(t.pass); navigator.vibrate?.(t.pass ? [40, 40, 40] : 140); if (t.pass) confetti(80, { x: innerWidth / 2, y: innerHeight * .2 });
@@ -601,7 +665,7 @@ function playMg() {
   whoosh(); updateMgLive();
   startMgLoop(pre => {
     if (started || pre > 0) return; started = true; $("#verb")?.classList.add("small"); $("#cd").textContent = "";
-    MGCTL = KMG.run($("#mgarea"), m, { rem: () => Math.max(0, ST.endsAt - nowS()), beep: mgBeep, onResult: ok => post("/api/mg", { ...creds(), ok }), onProg: n => post("/api/prog", { ...creds(), v: n }) });
+    MGCTL = KMG.run($("#mgarea"), m, { faces: ST.players.filter(p => p.avatar).map(p => ({ avatar: p.avatar, name: p.name })), rem: () => Math.max(0, ST.endsAt - nowS()), beep: mgBeep, onResult: ok => post("/api/mg", { ...creds(), ok }), onProg: n => post("/api/prog", { ...creds(), v: n }) });
   });
 }
 function playMgres() {

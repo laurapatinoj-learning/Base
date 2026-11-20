@@ -39,6 +39,16 @@
   .mgchoices{position:absolute;left:6%;right:6%;bottom:6%;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
   .mgchoices button{padding:16px 0;border:0;border-radius:16px;font-family:var(--font-display);font-size:2rem;background:#fff;color:#14102b;box-shadow:0 6px 0 rgba(0,0,0,.35)}
   .mgbig{position:absolute;inset:0 0 28% 0;display:grid;place-items:center;font-family:var(--font-display);font-size:min(16vw,4.4rem);text-align:center;padding:0 8px}
+  .mgfaces{position:absolute;inset:14% 6% 6% 6%;display:grid;gap:10px;align-content:center;justify-items:center}
+  .mgface{width:100%;max-width:104px;aspect-ratio:1;padding:0;border:5px solid #fff;border-radius:50%;overflow:hidden;background:#fff;box-shadow:0 6px 0 rgba(0,0,0,.35);touch-action:none}
+  .mgface img{display:block;width:100%;height:100%;object-fit:cover;pointer-events:none}
+  .mgface:active{transform:scale(.92)}
+  .mgstrip{position:absolute;left:0;right:0;top:34%;height:92px}
+  .mgsf{position:absolute;top:0;width:84px;height:84px;margin-left:-42px;border-radius:50%;overflow:hidden;border:4px solid #fff;background:#fff;box-shadow:0 5px 0 rgba(0,0,0,.35)}
+  .mgsf img{display:block;width:100%;height:100%;object-fit:cover}
+  .mgframe{position:absolute;left:50%;top:calc(34% - 14px);width:128px;height:120px;margin-left:-64px;border:5px solid #ffc21a;border-radius:18px;box-shadow:0 0 0 999px rgba(13,10,36,.45),0 0 24px #ffc21a;pointer-events:none}
+  .mgframe::before,.mgframe::after{content:"";position:absolute;width:18px;height:18px;border:4px solid #fff}
+  .mgframe::before{left:-9px;top:-9px;border-right:0;border-bottom:0}.mgframe::after{right:-9px;bottom:-9px;border-left:0;border-top:0}
   `;
   const st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
 
@@ -138,6 +148,33 @@
     opts.forEach(v => { const x = btn("", "", String(v)); x.onpointerdown = e => { e.preventDefault(); v === ans ? c.win() : c.fail(); }; ch.append(x); }); c.box.append(ch);
   } };
 
+  const faceURL = n => `/img/caras/cara-${String(n).padStart(2, "0")}.png`;
+  /* Elige a un compañero como objetivo (misma semilla para todos) y devuelve el reparto de caras */
+  function cast(c, extra) {
+    const named = c.faces.filter(f => f.avatar), all = shuffle([...Array(13).keys()].map(i => i + 1), c.rnd);
+    const target = named.length ? named[Math.floor(c.rnd() * named.length)] : { avatar: all[0], name: "la persona del círculo" };
+    return { target, others: all.filter(a => a !== target.avatar).slice(0, extra) };
+  }
+  D.find = { verb: "¡BUSCA!", mount(c) {
+    const n = c.level >= 3 ? 9 : 6, { target, others } = cast(c, n - 1), opts = shuffle([target.avatar, ...others], c.rnd);
+    c.box.append(el("mgsay", "", `¿Cuál es la cara de <b>${target.name.replace(/[<>&]/g, "")}</b>?`));
+    const g = el("mgfaces", `grid-template-columns:repeat(3,1fr)`); c.box.append(g);
+    opts.forEach(a => { const b = btn("mgface", "", `<img src="${faceURL(a)}" alt="">`); b.onpointerdown = e => { e.preventDefault(); a === target.avatar ? c.win() : c.fail(); }; g.append(b); });
+  } };
+  D.snap = { verb: "¡ENFOCA!", mount(c) {
+    const { target, others } = cast(c, 12), sp = 118, v = 0.22 + c.level * 0.02, tc = c.dur * (0.45 + c.rnd() * 0.12);
+    c.box.append(el("mgsay", "", `Foto a <b>${target.name.replace(/[<>&]/g, "")}</b>`));
+    const strip = el("mgstrip"); c.box.append(strip, el("mgframe"));
+    const lead = Math.ceil((220 + v * tc) / sp) + 2, tail = Math.ceil((220 + v * (c.dur - tc)) / sp) + 2, N = lead + 1 + tail, list = [];
+    for (let i = 0; i < N; i++) list.push(i === lead ? target.avatar : others[i % others.length]);
+    const items = list.map((a, i) => { const f = el("mgsf", "", `<img src="${faceURL(a)}" alt="">`); strip.append(f); return f; });
+    let fin = false;
+    const pos = t => { const mid = c.box.clientWidth / 2; return i => mid + (i - lead) * sp - v * (t - tc); };
+    let tNow = 0; c.raf((dt, t) => { tNow = t; const p = pos(t); items.forEach((f, i) => { f.style.left = p(i) + "px"; }); });
+    const shoot = e => { e.preventDefault(); if (fin) return; fin = true; const x = pos(tNow)(lead), mid = c.box.clientWidth / 2; Math.abs(x - mid) < 52 ? c.win() : c.fail(); };
+    c.box.onpointerdown = shoot;
+  } };
+
   /* ---- jefes: todo el equipo suma sobre una misma barra ---- */
   D.teamtap = { verb: "¡TODOS A TOCAR!", boss: true, mount(c) {
     let n = 0; const cnt = el("mg-count", "", `<b>0</b> toques tuyos`), b = btn("mgb", "background:#ffc21a;color:#14102b", "¡TOCA!");
@@ -159,7 +196,7 @@
     const flushProg = () => { if (pv !== sentProg) { sentProg = pv; hooks.onProg?.(pv); } };
     const pIv = def.boss ? setInterval(flushProg, 280) : 0;
     const ctx = {
-      box, level: mg.level, dur: mg.dur, rnd, rem: hooks.rem, beep: hooks.beep || (() => {}),
+      box, level: mg.level, dur: mg.dur, rnd, rem: hooks.rem, beep: hooks.beep || (() => {}), faces: hooks.faces || [],
       raf: fn => rafs.push(fn), timeout: (fn, ms) => tos.push(setTimeout(() => { if (!done) fn(); }, ms)),
       win: () => finish(true), fail: () => finish(false), prog: n => { pv = n; }
     };

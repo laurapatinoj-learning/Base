@@ -99,6 +99,30 @@ label.lbl { display: grid; gap: 6px; } .lbl > span { color: var(--mut); font-siz
 .avopt { width: 64px; height: 64px; padding: 0; border: 4px solid var(--line); border-radius: 50%; overflow: hidden; background: #fff; cursor: pointer; transition: transform .12s, border-color .2s, opacity .2s, box-shadow .2s; }
 .avopt img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .avopt:hover:not(:disabled) { transform: scale(1.12) rotate(-3deg); } .avopt.sel { border-color: var(--amber); transform: scale(1.14); box-shadow: 0 0 0 4px #ffc21a66; } .avopt:disabled { opacity: .3; filter: grayscale(1); cursor: not-allowed; }
+#hphoto, #ephoto { max-width: 900px; margin-inline: auto; }
+.pref { display: flex; gap: 12px; align-items: center; padding: 10px; border-radius: 18px; background: rgba(255,194,26,.14); border: 2px solid var(--amber); }
+.pref .face { width: 64px; height: 64px; border-radius: 50%; overflow: hidden; border: 4px solid var(--amber); flex: none; background: #fff; } .pref .face svg { display: block; width: 100%; height: 100%; }
+.pref button { background: none; border: 0; color: var(--cyan); font-weight: 900; text-decoration: underline; cursor: pointer; padding: 0 0 0 6px; }
+.spotbar { display: flex; align-items: center; gap: 12px; padding: 8px 14px; border-radius: 18px; background: rgba(255,194,26,.16); border: 2px dashed var(--amber); animation: rise .5s both; }
+.spotbar b { font-family: var(--font-display); font-weight: 400; font-size: 1.2rem; display: block; } .spotbar small { color: var(--mut); }
+.spotbar.me { background: linear-gradient(135deg, var(--amber), #ff9a1a); color: #14102b; border-style: solid; animation: rise .5s both, glow2 1.2s ease-in-out infinite; } .spotbar.me small { color: #4a3300; }
+@keyframes glow2 { 50% { box-shadow: 0 0 28px #ffc21a; } }
+.fastest { display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-radius: 20px; background: linear-gradient(135deg, #3b2aa8, #7c3aed); border: 2px solid var(--line); } .fastest .av { width: 72px; height: 72px; font-size: 2rem; animation: pop .6s cubic-bezier(.2,1.7,.4,1) both; }
+.fastest small { display: block; color: var(--amber); text-transform: uppercase; letter-spacing: .08em; font-size: .75rem; } .fastest b { font-family: var(--font-display); font-weight: 400; font-size: 1.5rem; }
+.ecap { text-align: center; min-height: 3.2rem; padding-top: 10px; } .ecap small { display: block; color: var(--amber); text-transform: uppercase; letter-spacing: .08em; } .ecap b { font-family: var(--font-display); font-weight: 400; font-size: 1.6rem; }
+.teambar2 { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(10px + env(safe-area-inset-bottom, 0px)); z-index: 56; display: flex; gap: 10px; padding: 14px 16px 8px; background: rgba(13,10,36,.86); border: 2px solid var(--line); border-radius: 22px; backdrop-filter: blur(8px); max-width: 96vw; overflow-x: auto; }
+.tb { position: relative; display: grid; justify-items: center; gap: 2px; flex: none; width: 64px; transition: transform .3s cubic-bezier(.2,1.8,.4,1); }
+.tb .av { width: 52px; height: 52px; opacity: .55; filter: grayscale(.6); transition: all .3s; }
+.tb .tbname { font-size: .68rem; max-width: 64px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--mut); }
+.tb .tbrole { position: absolute; right: 2px; top: -6px; font-size: 1rem; filter: drop-shadow(0 1px 2px #000); }
+.tb .tbmark { position: absolute; left: 2px; top: -6px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-weight: 900; font-size: .8rem; color: #fff; background: transparent; }
+.tb.ans { transform: translateY(-6px); } .tb.ans .av, .tb.ok .av { opacity: 1; filter: none; }
+.tb.ans .tbmark, .tb.ok .tbmark { background: var(--a3); } .tb.no .tbmark { background: var(--a0); } .tb.no .av { opacity: 1; filter: none; border-color: var(--a0) !important; animation: shake .4s; }
+.tb.ok { animation: hop .5s cubic-bezier(.2,1.8,.4,1); } @keyframes hop { 40% { transform: translateY(-16px) scale(1.12); } }
+.tb.spot .av { opacity: 1; filter: none; border-color: var(--amber) !important; box-shadow: 0 0 0 4px #ffc21a88, 0 0 20px #ffc21a; transform: scale(1.12); }
+.tb.spot::before { content: "FOCO ×2"; position: absolute; top: -16px; left: 50%; transform: translateX(-50%); background: var(--amber); color: #14102b; border-radius: 99px; font-size: .62rem; font-weight: 900; padding: 1px 8px; white-space: nowrap; z-index: 2; }
+body.hasbar { padding-bottom: 150px; } body.hasbar .dock { bottom: 112px; } body.hasbar .toast { bottom: 190px; }
+.abanner.spot { background: linear-gradient(135deg, var(--amber), #ff9a1a); } .abanner .av { width: 56px; height: 56px; }
 .av { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; color: #14102b; font-family: var(--font-display); font-size: 1.1rem; flex: none; border: 3px solid rgba(255,255,255,.7); }
 .vid { width: 100%; border-radius: 20px; border: 3px solid rgba(255,255,255,.2); background: #000; aspect-ratio: 16/9; display: block; }
 
@@ -183,7 +207,7 @@ input[type=range]::-moz-range-thumb { width: 38px; height: 38px; border-radius: 
 .toast { position: fixed; left: 50%; bottom: calc(76px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 80; background: #fff; color: #14102b; padding: 12px 20px; border-radius: 14px; font-weight: 900; box-shadow: 0 10px 30px rgba(0,0,0,.5); max-width: 90vw; animation: rise .3s both; }
 canvas.confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 65; }
 .gap-dock { height: 64px; }
-.dock[hidden] { display: none; }
+[hidden] { display: none !important; }
 .res-hero .pts { font-size: clamp(1.8rem, 9vw, 3rem); }
 @media (max-width: 720px) { .lobby-grid { grid-template-columns: 1fr; } .opts, .opts.three { grid-template-columns: 1fr; } .opt { min-height: 66px; } .match { gap: 12px 40px; } .podium { min-height: 250px; } .pod.p1 .col { height: 150px; } .pod.p2 .col { height: 110px; } .pod.p3 .col { height: 80px; } .opts.imgs { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } body.hot { animation: none; } }
@@ -226,6 +250,7 @@ canvas.confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-
 <main id="app" class="wrap" aria-live="polite"></main>
 <div id="dock" class="dock" hidden></div>
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js" async onerror="window.__noqr=1"></script>
+<script src="/team.js"></script>
 <script src="/minigames.js"></script>
 <script src="/app.js"></script>
 </body>

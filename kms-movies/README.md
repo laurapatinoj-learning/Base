@@ -19,7 +19,11 @@ Todos los jugadores forman **un solo equipo** que comparte vidas y puntos.
 - **Preguntas:** el equipo las supera si al menos la mitad de los aciertos del grupo lo logra (cuenta el porcentaje de acierto de todos).
 - **Microjuegos:** entre pregunta y pregunta, cada jugador juega el mismo microjuego en su celular. Pasa si lo supera al menos la mitad del equipo. Cada ronda superada sube la velocidad.
 - **Jefes:** cada película termina con un jefe en el que todos suman toques a una misma barra. Vencerlo devuelve una vida.
-- **Avatares:** cada jugador elige una de las 13 caras del equipo (`server/public/img/caras`). Cada cara la usa una sola persona; si hay más de 13 jugadores, los últimos entran con la inicial de su apodo.
+- **La foto del equipo es el escenario:** en la portada tocas tu cara en la foto para entrar con ella. En la sala, el organizador ve la foto llenándose en vivo con los nombres, y cada jugador puede cambiar de cara tocando otra en la foto. Cada cara la usa una sola persona (hay 13; si entran más, los últimos usan la inicial de su apodo).
+- **El foco:** en cada pregunta o microjuego, un jugador rotativo queda "en el foco". Su resultado vale doble para el equipo, y el organizador lo ve resaltado en la barra del equipo.
+- **Barra del equipo:** en pantalla grande, las caras muestran en vivo quién respondió, quién superó el microjuego, el personaje de cada uno, y de ellas salen las reacciones con emojis.
+- **Más rápido en acertar:** al revelar cada pregunta se destaca a quien acertó primero.
+- **Premios en cámara:** al final, la foto hace zoom a cada ganador de los premios.
 - **Personajes:** cada jugador elige uno y puede usar su habilidad una vez por función.
 
 | Personaje | Habilidad |
@@ -33,7 +37,7 @@ Todos los jugadores forman **un solo equipo** que comparte vidas y puntos.
 - **Combo:** cada acierto seguido sube el multiplicador de puntos del equipo (hasta ×1.5).
 - **Al final:** estrellas según las vidas que quedan y premios individuales (máximo anotador, gatillo más rápido, estrella de los microjuegos).
 
-Microjuegos: ¡TOCA!, ¡ATRAPA!, ¡DESLIZA!, ¡PARA!, ¡ESQUIVA!, ¡ENCUENTRA!, ¡ALTERNA!, ¡MEMORIZA!, ¡CUENTA!, ¡SUMA! y dos jefes (¡TODOS A TOCAR! y ¡TODOS A ALTERNAR!).
+Microjuegos: ¡TOCA!, ¡ATRAPA!, ¡DESLIZA!, ¡PARA!, ¡ESQUIVA!, ¡ENCUENTRA!, ¡ALTERNA!, ¡MEMORIZA!, ¡CUENTA!, ¡SUMA!, ¡BUSCA! (encuentra la cara de un compañero), ¡ENFOCA! (toma la foto cuando su cara pasa por el visor) y dos jefes (¡TODOS A TOCAR! y ¡TODOS A ALTERNAR!).
 
 Tipos de pregunta: opción múltiple, adivina la imagen, elige la imagen, verdadero/falso (tarjeta que se desliza),
 selección múltiple, respuesta escrita, deslizador, ordenar arrastrando y emparejar.
@@ -91,6 +95,7 @@ docker run -p 3000:3000 -e HOST_PASSWORD=una-clave kms-movies
 - `server/questions.js`: banco de preguntas (`BANK`) y orden por película (`ORDER`).
 - `server/server.js`: plan de la función (`buildPlan`), vidas, puntos y habilidades.
 - `server/public/minigames.js`: los microjuegos.
+- `server/public/team.js`: la foto interactiva del equipo (círculos de cada cara, zoom de cámara).
 
 ## Motion graphics (Remotion)
 
