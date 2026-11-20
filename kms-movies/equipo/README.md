@@ -1,9 +1,6 @@
-# Equipo KMS · foto segmentada
+# Equipo KMS · caras en círculos
 
-- `index.html`: página autónoma (abre el archivo en el navegador). Toca a cualquiera de las 14 personas para aislarla, ver su recorte y su información; los nombres y roles se guardan en el navegador.
-- `personas/persona-01.png … persona-14.png`: recortes con fondo transparente.
-- `mascaras.json`: contornos (polígonos) de cada persona sobre la foto de 1099×688 px.
-- `personas.json`: caja, centro, área y descripción visual de cada persona.
+- `index.html`: página autónoma. Toca el círculo de cualquier cara en la foto (o en la tira de abajo) para elegirla y ver su avatar redondo y su información. Los nombres y roles se guardan en el navegador.
+- `caras/cara-01.png … cara-14.png`: avatares circulares de 256×256 px con fondo transparente.
+- `personas.json`: círculo de cada cara (centro y radio sobre la foto de 1099×688 px) y descripción visual.
 - `imagen-original.jpg`: foto fuente.
-
-La segmentación se hizo con semillas manuales y watershed (OpenCV). Donde dos personas se superponen, el borde es una estimación.

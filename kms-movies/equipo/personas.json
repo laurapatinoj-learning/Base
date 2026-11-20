@@ -1,296 +1,184 @@
 [
  {
   "id": 1,
-  "bbox": [
-   1,
-   154,
-   196,
-   533
-  ],
-  "centroid": [
-   90,
-   436
-  ],
-  "area": 78252,
-  "info": {
-   "resumen": "Cabello corto oscuro y sonrisa amplia",
-   "ubicacion": "Primer plano, extremo izquierdo",
-   "cabello": "Corto, oscuro",
-   "ropa": "Chaqueta de mezclilla azul sobre camiseta blanca y jeans oscuros",
-   "accesorios": "Cordón verde y naranja con credencial morada"
-  }
+  "cara": {
+   "cx": 138,
+   "cy": 192,
+   "radio": 46
+  },
+  "resumen": "Cabello corto oscuro y sonrisa amplia",
+  "ubicacion": "Primer plano, extremo izquierdo",
+  "cabello": "Corto, oscuro",
+  "ropa": "Chaqueta de mezclilla azul sobre camiseta blanca y jeans oscuros",
+  "accesorios": "Cordón verde y naranja con credencial morada"
  },
  {
   "id": 2,
-  "bbox": [
-   147,
-   182,
-   114,
-   505
-  ],
-  "centroid": [
-   198,
-   441
-  ],
-  "area": 26645,
-  "info": {
-   "resumen": "Cabello largo oscuro y blusa rosa",
-   "ubicacion": "Segunda desde la izquierda, detrás de la 1",
-   "cabello": "Largo, oscuro, suelto",
-   "ropa": "Blusa rosa y pantalón negro",
-   "accesorios": "Cordón rosado con credencial"
-  }
+  "cara": {
+   "cx": 207,
+   "cy": 225,
+   "radio": 40
+  },
+  "resumen": "Cabello largo oscuro y blusa rosa",
+  "ubicacion": "Segunda desde la izquierda, detrás de la 1",
+  "cabello": "Largo, oscuro, suelto",
+  "ropa": "Blusa rosa y pantalón negro",
+  "accesorios": "Cordón rosado con credencial"
  },
  {
   "id": 3,
-  "bbox": [
-   244,
-   134,
-   127,
-   209
-  ],
-  "centroid": [
-   302,
-   228
-  ],
-  "area": 14732,
-  "info": {
-   "resumen": "Cabello largo castaño y top claro",
-   "ubicacion": "Tercera desde la izquierda, atrás",
-   "cabello": "Largo, castaño oscuro",
-   "ropa": "Top blanco con tono rosado",
-   "accesorios": "Cordón naranja con credencial"
-  }
+  "cara": {
+   "cx": 300,
+   "cy": 188,
+   "radio": 40
+  },
+  "resumen": "Cabello largo castaño y top claro",
+  "ubicacion": "Tercera desde la izquierda, atrás",
+  "cabello": "Largo, castaño oscuro",
+  "ropa": "Top blanco con tono rosado",
+  "accesorios": "Cordón naranja con credencial"
  },
  {
   "id": 4,
-  "bbox": [
-   98,
-   132,
-   335,
-   555
-  ],
-  "centroid": [
-   308,
-   461
-  ],
-  "area": 76321,
-  "info": {
-   "resumen": "Inclinada hacia el frente, con gafas de sol y sudadera negra",
-   "ubicacion": "Primer plano, centro-izquierda",
-   "cabello": "Largo, oscuro, suelto",
-   "ropa": "Sudadera negra con capucha y pantalón negro",
-   "accesorios": "Gafas de sol oscuras y cordón vino con credencial"
-  }
+  "cara": {
+   "cx": 390,
+   "cy": 325,
+   "radio": 38
+  },
+  "resumen": "Inclinada hacia el frente, con gafas de sol y sudadera negra",
+  "ubicacion": "Primer plano, centro-izquierda",
+  "cabello": "Largo, oscuro, suelto",
+  "ropa": "Sudadera negra con capucha y pantalón negro",
+  "accesorios": "Gafas de sol oscuras y cordón vino con credencial"
  },
  {
   "id": 5,
-  "bbox": [
-   368,
-   168,
-   117,
-   519
-  ],
-  "centroid": [
-   425,
-   447
-  ],
-  "area": 27497,
-  "info": {
-   "resumen": "Cabello largo oscuro y top gris",
-   "ubicacion": "Centro-izquierda, detrás de la 4",
-   "cabello": "Largo, oscuro",
-   "ropa": "Top gris y pantalón negro",
-   "accesorios": "Cordón rosado y morado con credencial"
-  }
+  "cara": {
+   "cx": 415,
+   "cy": 225,
+   "radio": 40
+  },
+  "resumen": "Cabello largo oscuro y top gris",
+  "ubicacion": "Centro-izquierda, detrás de la 4",
+  "cabello": "Largo, oscuro",
+  "ropa": "Top gris y pantalón negro",
+  "accesorios": "Cordón rosado y morado con credencial"
  },
  {
   "id": 6,
-  "bbox": [
-   436,
-   88,
-   132,
-   209
-  ],
-  "centroid": [
-   490,
-   182
-  ],
-  "area": 12528,
-  "info": {
-   "resumen": "La persona más alta del fondo, cabello ondulado",
-   "ubicacion": "Fondo central",
-   "cabello": "Ondulado, castaño, a la altura del cuello",
-   "ropa": "Chaqueta beige sobre camiseta oscura",
-   "accesorios": "Cordón blanco"
-  }
+  "cara": {
+   "cx": 490,
+   "cy": 135,
+   "radio": 40
+  },
+  "resumen": "La persona más alta del fondo, cabello ondulado",
+  "ubicacion": "Fondo central",
+  "cabello": "Ondulado, castaño, a la altura del cuello",
+  "ropa": "Chaqueta beige sobre camiseta oscura",
+  "accesorios": "Cordón blanco"
  },
  {
   "id": 7,
-  "bbox": [
-   435,
-   200,
-   173,
-   487
-  ],
-  "centroid": [
-   518,
-   435
-  ],
-  "area": 50744,
-  "info": {
-   "resumen": "Cabello recogido, chaqueta de mezclilla y bufanda gris",
-   "ubicacion": "Centro, primer plano",
-   "cabello": "Recogido hacia atrás, castaño",
-   "ropa": "Chaqueta de mezclilla, bufanda gris y jeans claros",
-   "accesorios": "Reloj en la muñeca"
-  }
+  "cara": {
+   "cx": 530,
+   "cy": 235,
+   "radio": 42
+  },
+  "resumen": "Cabello recogido, chaqueta de mezclilla y bufanda gris",
+  "ubicacion": "Centro, primer plano",
+  "cabello": "Recogido hacia atrás, castaño",
+  "ropa": "Chaqueta de mezclilla, bufanda gris y jeans claros",
+  "accesorios": "Reloj en la muñeca"
  },
  {
   "id": 8,
-  "bbox": [
-   562,
-   152,
-   93,
-   535
-  ],
-  "centroid": [
-   603,
-   417
-  ],
-  "area": 23776,
-  "info": {
-   "resumen": "Cabello negro largo y top oscuro",
-   "ubicacion": "Detrás, a la derecha de la 7",
-   "cabello": "Largo, negro, liso",
-   "ropa": "Top oscuro y pantalón negro",
-   "accesorios": "Cordón rosado con credencial"
-  }
+  "cara": {
+   "cx": 600,
+   "cy": 198,
+   "radio": 36
+  },
+  "resumen": "Cabello negro largo y top oscuro",
+  "ubicacion": "Detrás, a la derecha de la 7",
+  "cabello": "Largo, negro, liso",
+  "ropa": "Top oscuro y pantalón negro",
+  "accesorios": "Cordón rosado con credencial"
  },
  {
   "id": 9,
-  "bbox": [
-   601,
-   164,
-   180,
-   523
-  ],
-  "centroid": [
-   695,
-   458
-  ],
-  "area": 63547,
-  "info": {
-   "resumen": "Anteojos redondos, flequillo y camiseta a rayas",
-   "ubicacion": "Centro-derecha, primer plano",
-   "cabello": "Largo, oscuro, con flequillo",
-   "ropa": "Camiseta de rayas blancas y negras y pantalón negro ancho",
-   "accesorios": "Anteojos redondos y cordón verde y naranja con credencial azul"
-  }
+  "cara": {
+   "cx": 700,
+   "cy": 215,
+   "radio": 40
+  },
+  "resumen": "Anteojos redondos, flequillo y camiseta a rayas",
+  "ubicacion": "Centro-derecha, primer plano",
+  "cabello": "Largo, oscuro, con flequillo",
+  "ropa": "Camiseta de rayas blancas y negras y pantalón negro ancho",
+  "accesorios": "Anteojos redondos y cordón verde y naranja con credencial azul"
  },
  {
   "id": 10,
-  "bbox": [
-   700,
-   143,
-   120,
-   544
-  ],
-  "centroid": [
-   772,
-   349
-  ],
-  "area": 17297,
-  "info": {
-   "resumen": "Cabello largo castaño, parcialmente oculta",
-   "ubicacion": "Detrás, entre la 9 y la 11",
-   "cabello": "Largo, castaño oscuro",
-   "ropa": "Prenda oscura",
-   "accesorios": "Sin accesorios visibles"
-  }
+  "cara": {
+   "cx": 770,
+   "cy": 195,
+   "radio": 38
+  },
+  "resumen": "Cabello largo castaño, parcialmente oculta",
+  "ubicacion": "Detrás, entre la 9 y la 11",
+  "cabello": "Largo, castaño oscuro",
+  "ropa": "Prenda oscura",
+  "accesorios": "Sin accesorios visibles"
  },
  {
   "id": 11,
-  "bbox": [
-   758,
-   159,
-   204,
-   528
-  ],
-  "centroid": [
-   854,
-   403
-  ],
-  "area": 64358,
-  "info": {
-   "resumen": "Gafas de sol, sudadera negra y jeans claros",
-   "ubicacion": "Derecha, primer plano",
-   "cabello": "Largo, oscuro, suelto",
-   "ropa": "Sudadera negra y jeans claros",
-   "accesorios": "Gafas de sol y cordón naranja y verde con credencial rosada"
-  }
+  "cara": {
+   "cx": 865,
+   "cy": 215,
+   "radio": 40
+  },
+  "resumen": "Gafas de sol, sudadera negra y jeans claros",
+  "ubicacion": "Derecha, primer plano",
+  "cabello": "Largo, oscuro, suelto",
+  "ropa": "Sudadera negra y jeans claros",
+  "accesorios": "Gafas de sol y cordón naranja y verde con credencial rosada"
  },
  {
   "id": 12,
-  "bbox": [
-   884,
-   73,
-   82,
-   614
-  ],
-  "centroid": [
-   922,
-   308
-  ],
-  "area": 12126,
-  "info": {
-   "resumen": "Cabello oscuro peinado hacia arriba y chaqueta azul marino",
-   "ubicacion": "Fondo, derecha, detrás de la 11 y la 13",
-   "cabello": "Corto, oscuro, ondulado",
-   "ropa": "Chaqueta azul marino y pantalón de tono claro",
-   "accesorios": "Sin accesorios visibles"
-  }
+  "cara": {
+   "cx": 926,
+   "cy": 120,
+   "radio": 40
+  },
+  "resumen": "Cabello oscuro peinado hacia arriba y chaqueta azul marino",
+  "ubicacion": "Fondo, derecha, detrás de la 11 y la 13",
+  "cabello": "Corto, oscuro, ondulado",
+  "ropa": "Chaqueta azul marino y pantalón de tono claro",
+  "accesorios": "Sin accesorios visibles"
  },
  {
   "id": 13,
-  "bbox": [
-   919,
-   166,
-   179,
-   521
-  ],
-  "centroid": [
-   1013,
-   440
-  ],
-  "area": 73943,
-  "info": {
-   "resumen": "Cabello largo oscuro y chaqueta vino brillante",
-   "ubicacion": "Derecha, primer plano",
-   "cabello": "Largo, oscuro, suelto",
-   "ropa": "Chaqueta vino brillante, camiseta oscura y pantalón negro",
-   "accesorios": "Cordón verde con credencial blanca"
-  }
+  "cara": {
+   "cx": 1000,
+   "cy": 218,
+   "radio": 40
+  },
+  "resumen": "Cabello largo oscuro y chaqueta vino brillante",
+  "ubicacion": "Derecha, primer plano",
+  "cabello": "Largo, oscuro, suelto",
+  "ropa": "Chaqueta vino brillante, camiseta oscura y pantalón negro",
+  "accesorios": "Cordón verde con credencial blanca"
  },
  {
   "id": 14,
-  "bbox": [
-   1037,
-   77,
-   61,
-   225
-  ],
-  "centroid": [
-   1075,
-   195
-  ],
-  "area": 7860,
-  "info": {
-   "resumen": "Lentes y barba corta, recortado por el borde derecho",
-   "ubicacion": "Extremo derecho, fondo",
-   "cabello": "Corto, oscuro, peinado hacia arriba",
-   "ropa": "Chaqueta oscura",
-   "accesorios": "Lentes"
-  }
+  "cara": {
+   "cx": 1077,
+   "cy": 128,
+   "radio": 34
+  },
+  "resumen": "Lentes y barba corta, recortado por el borde derecho",
+  "ubicacion": "Extremo derecho, fondo",
+  "cabello": "Corto, oscuro, peinado hacia arriba",
+  "ropa": "Chaqueta oscura",
+  "accesorios": "Lentes"
  }
 ]
