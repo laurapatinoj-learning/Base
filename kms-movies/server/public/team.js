@@ -9,7 +9,7 @@
  * Devuelve { update(players, meId), spot(n | null), el }
  */
 (function () {
-  const W = 1099, H = 688, PHOTO = "/img/equipo.jpg";
+  const W = 1099, H = 688, PHOTO = "img/equipo.jpg";
   /* círculos de cada cara: [cx, cy, radio] sobre la foto de 1099×688; la clave es el número de avatar */
   const FACES = {
     1: [138, 192, 46], 2: [207, 225, 40], 3: [300, 188, 40], 4: [390, 325, 38], 5: [415, 225, 40], 6: [490, 135, 40], 7: [530, 235, 42],

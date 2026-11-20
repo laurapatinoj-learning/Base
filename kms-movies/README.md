@@ -8,7 +8,8 @@ kms-movies/
 ├─ server/          Juego para montar en un servidor (Node, sin dependencias)
 ├─ remotion-intro/  Motion graphics (Remotion) que se reproducen en el juego
 └─ artifact-v1/     Primera versión publicada como artefacto de Claude (sin servidor)
-render.yaml         Blueprint para desplegar en Render
+render.yaml         Blueprint para desplegar el servidor en Render
+.github/workflows/  Publicación de la página en GitHub Pages
 ```
 
 ## Cómo se juega
@@ -59,14 +60,19 @@ Los jugadores entran con **Jugar** o escaneando el QR (`/?pin=123456`).
 | `PORT` | Puerto HTTP (por defecto 3000; Render lo define solo) |
 | `HOST_PASSWORD` | Si se define, crear una sala exige esta contraseña |
 
-## Desplegar en Render
+## Publicar el juego
 
-1. Sube este repositorio a GitHub (ya incluye `render.yaml` en la raíz).
+El juego tiene dos partes: la **página** (HTML, JavaScript, imágenes y videos) y el **servidor en tiempo real** (`server/server.js`).
+GitHub Pages solo sirve la página, así que el servidor siempre va en Render (o en otro hosting con Node).
+
+### Opción A · Todo en Render (la más simple)
+
+1. Sube este repositorio a GitHub (incluye `render.yaml` en la raíz).
 2. En Render: **New → Blueprint**, elige el repositorio y confirma.
-3. Cuando lo pida, escribe un valor para `HOST_PASSWORD` (la clave con la que el organizador crea salas).
-4. Al terminar el despliegue, abre la URL `https://kms-movies.onrender.com` (o la que te asigne Render).
+3. Escribe un valor para `HOST_PASSWORD` (la clave con la que el organizador crea salas).
+4. Abre la URL que te asigne Render (por ejemplo `https://kms-movies.onrender.com`). Render sirve la página y el servidor juntos, sin más configuración.
 
-Sin Blueprint también puedes crear un **Web Service** a mano con estos datos:
+Sin Blueprint también puedes crear un **Web Service** a mano:
 
 | Campo | Valor |
 |---|---|
@@ -76,11 +82,33 @@ Sin Blueprint también puedes crear un **Web Service** a mano con estos datos:
 | Start Command | `node server.js` |
 | Health Check Path | `/healthz` |
 
-Cosas a tener en cuenta en Render:
-- El plan gratuito apaga el servicio tras 15 minutos sin tráfico y tarda cerca de un minuto en despertar. Abre la URL antes de empezar con el grupo.
+### Opción B · Página en GitHub Pages y servidor en Render
+
+1. Despliega el servidor en Render como en la opción A y copia su URL.
+2. En Render, en la variable `ALLOWED_ORIGIN`, escribe el origen de tu página: `https://TU-USUARIO.github.io` (sin barra final ni nombre del repositorio).
+3. En GitHub: **Settings → Pages → Source: GitHub Actions**.
+4. En GitHub: **Settings → Secrets and variables → Actions → Variables → New repository variable**: nombre `KMS_API_URL`, valor la URL de Render (`https://kms-movies.onrender.com`).
+5. Haz push a la rama `main` (o ejecuta **Actions → Publicar en GitHub Pages → Run workflow**). La página queda en `https://TU-USUARIO.github.io/NOMBRE-DEL-REPO/`.
+
+El flujo `.github/workflows/pages.yml` ejecuta `node kms-movies/server/build-static.js dist` y publica la carpeta `dist`.
+
+### Opción C · Subir el HTML a mano
+
+```bash
+cd kms-movies/server
+KMS_API_URL=https://kms-movies.onrender.com node build-static.js dist
+```
+
+Genera `dist/` con `index.html` (CSS y JavaScript incluidos), `config.js`, `img/` y `media/`. Sube esa carpeta a cualquier hosting de archivos.
+Si cambias de servidor después, solo edita `config.js` (`window.KMS_CONFIG = { api: "https://..." }`).
+
+### Qué tener en cuenta
+
+- El plan gratuito de Render apaga el servicio tras 15 minutos sin tráfico y tarda cerca de un minuto en despertar. Abre la URL del servidor antes de empezar con el grupo.
 - El estado vive en memoria: si Render reinicia el servicio, se cierran las salas activas.
-- El juego usa Server-Sent Events (HTTP normal), así que no necesita WebSockets ni configuración extra.
+- El juego usa Server-Sent Events (HTTP normal): no necesita WebSockets ni configuración extra.
 - El código QR del lobby se genera con `qrcode-generator` desde jsDelivr. Sin internet, el organizador comparte el PIN o el enlace.
+- Todas las rutas de archivos son relativas, por eso la página funciona también en subcarpetas como `usuario.github.io/repo/`.
 
 ### Docker
 

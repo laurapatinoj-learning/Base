@@ -13,3 +13,5 @@ services:
         value: "22"
       - key: HOST_PASSWORD
         sync: false   # Render te pide el valor al crear el Blueprint
+      - key: ALLOWED_ORIGIN
+        value: "*"      # con GitHub Pages, cámbialo por https://TU-USUARIO.github.io

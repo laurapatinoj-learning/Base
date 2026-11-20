@@ -16,6 +16,7 @@ const { FILMS, BANK, ORDER } = require("./questions");
 
 const PORT = +process.env.PORT || 3000;
 const HOST_PASSWORD = process.env.HOST_PASSWORD || "";
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "*"; // origen de GitHub Pages, p. ej. https://usuario.github.io
 const MAX_PLAYERS = 15;
 const MAX_ROOMS = 50;
 const START_HEARTS = 4, MAX_HEARTS = 5, MAX_SHIELD = 2;
@@ -490,6 +491,12 @@ function serve(req, res, url) {
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, "http://x");
   res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("Access-Control-Allow-Origin", ALLOWED_ORIGIN);
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Max-Age", "86400");
+  if (ALLOWED_ORIGIN !== "*") res.setHeader("Vary", "Origin");
+  if (req.method === "OPTIONS") { res.writeHead(204); return res.end(); }
   if (url.pathname.startsWith("/api/") || url.pathname === "/events") api(req, res, url).catch(e => { console.error(e); try { json(res, 500, { error: "server" }); } catch (x) {} });
   else if (url.pathname === "/healthz") { res.writeHead(200); res.end("ok"); }
   else serve(req, res, url);
