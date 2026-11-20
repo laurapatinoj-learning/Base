@@ -94,6 +94,11 @@ label.lbl { display: grid; gap: 6px; } .lbl > span { color: var(--mut); font-siz
 .players { display: flex; flex-wrap: wrap; gap: 10px; }
 .pl { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px 6px 6px; border-radius: 999px; background: rgba(255,255,255,.1); border: 1px solid var(--line); animation: pop .4s cubic-bezier(.2,1.7,.4,1) both; max-width: 100%; transition: opacity .3s; }
 .pl.off { opacity: .45; } .pl .av { width: 32px; height: 32px; } .pl button { background: none; border: 0; color: var(--mut); padding: 0 0 0 4px; font-size: 1.1rem; }
+.av.img { background: #fff; padding: 0; overflow: hidden; } .av.img img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.avgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 10px; justify-items: center; }
+.avopt { width: 64px; height: 64px; padding: 0; border: 4px solid var(--line); border-radius: 50%; overflow: hidden; background: #fff; cursor: pointer; transition: transform .12s, border-color .2s, opacity .2s, box-shadow .2s; }
+.avopt img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.avopt:hover:not(:disabled) { transform: scale(1.12) rotate(-3deg); } .avopt.sel { border-color: var(--amber); transform: scale(1.14); box-shadow: 0 0 0 4px #ffc21a66; } .avopt:disabled { opacity: .3; filter: grayscale(1); cursor: not-allowed; }
 .av { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; color: #14102b; font-family: var(--font-display); font-size: 1.1rem; flex: none; border: 3px solid rgba(255,255,255,.7); }
 .vid { width: 100%; border-radius: 20px; border: 3px solid rgba(255,255,255,.2); background: #000; aspect-ratio: 16/9; display: block; }
 

@@ -167,18 +167,5 @@
   "cabello": "Largo, oscuro, suelto",
   "ropa": "Chaqueta vino brillante, camiseta oscura y pantalón negro",
   "accesorios": "Cordón verde con credencial blanca"
- },
- {
-  "id": 14,
-  "cara": {
-   "cx": 1077,
-   "cy": 128,
-   "radio": 34
-  },
-  "resumen": "Lentes y barba corta, recortado por el borde derecho",
-  "ubicacion": "Extremo derecho, fondo",
-  "cabello": "Corto, oscuro, peinado hacia arriba",
-  "ropa": "Chaqueta oscura",
-  "accesorios": "Lentes"
  }
 ]

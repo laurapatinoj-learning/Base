@@ -23,7 +23,9 @@ const sess = { get(k) { try { return JSON.parse(localStorage.getItem(k) || "null
 const post = (p, b) => fetch(p, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(b || {}) }).then(async r => ({ ok: r.ok, status: r.status, d: await r.json().catch(() => ({})) })).catch(() => ({ ok: false, status: 0, d: {} }));
 const creds = () => ({ code: S.code, id: S.id, token: S.token });
 const shapeSVG = i => `<svg class="sh" viewBox="0 0 100 100" aria-hidden="true">${['<path d="M50 8 L94 88 H6 Z"/>', '<path d="M50 4 L96 50 L50 96 L4 50 Z"/>', '<circle cx="50" cy="50" r="44"/>', '<rect x="10" y="10" width="80" height="80" rx="6"/>', '<path d="M50 6 L62 38 L96 38 L68 58 L79 92 L50 71 L21 92 L32 58 L4 38 L38 38 Z"/>'][i % 5]}</svg>`;
-const avatar = (p, cls = "") => `<span class="av ${cls}" style="background:${p.color};color:#14102b">${esc((p.name || "?").charAt(0).toUpperCase())}</span>`;
+const avatar = (p, cls = "", attrs = "") => p.avatar
+  ? `<span class="av img ${cls}" ${attrs} style="border-color:${esc(p.color)}"><img src="/img/caras/cara-${String(p.avatar).padStart(2, "0")}.png" alt="${esc(p.name)}" loading="lazy" decoding="async"></span>`
+  : `<span class="av ${cls}" ${attrs} style="background:${esc(p.color)};color:#14102b">${esc((p.name || "?").charAt(0).toUpperCase())}</span>`;
 const filmChip = f => `<span class="chip" style="background:${esc(f?.color || "#ffc21a")}">${esc(f?.name || "")}</span>`;
 const nowS = () => Date.now() + skew;
 const HEART = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z"/></svg>`;
@@ -398,7 +400,7 @@ function mgHead() {
   return `<div class="top"><div class="row">${filmChip(FILMS[s.film])}<span class="chip ${m.boss ? "" : "dark"}" style="${m.boss ? "background:var(--pink);color:#fff" : ""}">${m.boss ? (m.final ? "JEFE FINAL" : "JEFE") : "MICROJUEGO"}</span>${m.level >= 3 && !m.boss ? `<span class="chip dark">Velocidad ×${(1 + m.level * .1).toFixed(1)}</span>` : ""}</div></div>
     <div class="verbwrap"><div class="verb ${m.boss ? "boss" : ""}" id="verb">${esc(v)}</div><div class="cd" id="cd"></div></div>`;
 }
-function matesHTML() { return ST.players.map(p => `<span class="av mate" data-pid="${esc(p.id)}" title="${esc(p.name)}" style="background:${p.color};color:#14102b">${esc(p.name.charAt(0).toUpperCase())}</span>`).join(""); }
+function matesHTML() { return ST.players.map(p => avatar(p, "mate", `data-pid="${esc(p.id)}" title="${esc(p.name)}"`)).join(""); }
 function updateMgLive() {
   const s = ST, m = s.mg; if (!m) return;
   $$("#mates .av").forEach(a => { const p = s.players.find(x => x.id === a.dataset.pid); if (!p) return; a.classList.toggle("on", !m.boss && p.done && p.ok); a.classList.toggle("no", !m.boss && p.done && !p.ok); });
@@ -427,7 +429,7 @@ function hostMgres() {
 
 /* ---- final de equipo ---- */
 function starsHTML(n) { return `<div class="stars" aria-label="${n} de 3 estrellas">${[1, 2, 3].map(i => `<svg viewBox="0 0 100 100" class="${i <= n ? "on" : ""}" style="animation-delay:${.4 + i * .25}s"><path d="M50 6 L62 38 L96 38 L68 58 L79 92 L50 71 L21 92 L32 58 L4 38 L38 38 Z"/></svg>`).join("")}</div>`; }
-function awardsHTML() { const a = ST.awards || []; return a.length ? `<div class="awards">${a.map((x, i) => `<div class="award" style="animation-delay:${.6 + i * .15}s"><span class="av" style="background:${x.color};color:#14102b">${esc(x.name.charAt(0).toUpperCase())}</span><div><small>${esc(x.title)}</small><b>${esc(x.name)}</b><span class="mut">${esc(x.note)}</span></div></div>`).join("")}</div>` : ""; }
+function awardsHTML() { const a = ST.awards || []; return a.length ? `<div class="awards">${a.map((x, i) => `<div class="award" style="animation-delay:${.6 + i * .15}s">${avatar(x)}<div><small>${esc(x.title)}</small><b>${esc(x.name)}</b><span class="mut">${esc(x.note)}</span></div></div>`).join("")}</div>` : ""; }
 function hostEnd() {
   const s = ST;
   view(`${s.win ? `<video class="vid" src="/media/finale.mp4" autoplay muted playsinline style="max-height:34vh;object-fit:cover"></video>` : ""}
@@ -477,8 +479,11 @@ function playRender(prev) {
   if (s.phase === "mgres") return playMgres();
   if (s.phase === "end") return playEnd();
 }
+async function playLobbyInfo() { if (!S.info) S.info = await fetch("/api/info").then(r => r.json()).catch(() => null); if (ST?.phase === "lobby") playLive(null); }
 function playLobby() {
+  playLobbyInfo();
   view(`<div class="logo"><div class="kms" style="font-size:clamp(3.4rem,18vw,6rem)"><span>K</span><span>M</span><span>S</span></div></div>
+    <div class="card"><h2 style="font-size:1.6rem;text-align:center">Elige tu avatar</h2><p class="mut" style="margin:6px 0 12px;text-align:center">Cada cara la puede usar una sola persona.</p><div class="avgrid" id="avs"></div></div>
     <div class="card"><h2 style="font-size:1.6rem;text-align:center">Elige tu personaje</h2><p class="mut center" style="margin:6px 0 12px;text-align:center">Cada uno tiene una habilidad que puedes usar una vez para ayudar al equipo.</p><div class="roles" id="roles"></div></div>
     <div class="card"><div class="top"><h2 style="font-size:1.3rem">El equipo</h2><span class="mut" id="wc"></span></div><div class="players" id="plist" style="margin-top:10px"></div></div><div class="gap-dock"></div>`);
   playLive(null);
@@ -488,6 +493,11 @@ function playLive(prev) {
   if (s.phase === "lobby") {
     const wc = $("#wc"); if (wc) wc.textContent = `${s.players.length} jugador${s.players.length === 1 ? "" : "es"}`;
     const el = $("#plist"); if (el) { const known = new Set($$("[data-pid]", el).map(x => x.dataset.pid)); el.innerHTML = s.players.map(p => `<span class="pl" data-pid="${esc(p.id)}" style="${known.has(p.id) ? "animation:none" : ""}">${avatar(p)}${esc(p.name)} <span>${ROLES[p.role]?.icon || ""}</span></span>`).join(""); }
+    const ag = $("#avs"); if (ag) {
+      const me = s.players.find(p => p.id === S.id), n = S.info?.avatars || 13;
+      if (!ag.children.length) { ag.innerHTML = Array.from({ length: n }, (_, i) => `<button class="avopt" data-a="${i + 1}" aria-label="Avatar ${i + 1}"><img src="/img/caras/cara-${String(i + 1).padStart(2, "0")}.png" alt="" loading="lazy"></button>`).join(""); $$(".avopt", ag).forEach(b => b.onclick = async () => { beep(700, .06, "triangle"); const r = await post("/api/avatar", { ...creds(), avatar: +b.dataset.a }); if (!r.ok) toast(r.d.error === "taken" ? "Ese avatar ya lo eligió alguien más." : "No se pudo cambiar el avatar."); }); }
+      $$(".avopt", ag).forEach(b => { const a = +b.dataset.a, owner = s.players.find(p => p.avatar === a); b.classList.toggle("sel", me?.avatar === a); b.disabled = !!owner && owner.id !== S.id; b.title = owner && owner.id !== S.id ? "Elegido por " + owner.name : ""; });
+    }
     const rl = $("#roles"); if (rl) {
       const mine = s.me?.role;
       if (!rl.children.length) { rl.innerHTML = Object.entries(ROLES).map(([k, r]) => `<button class="rolecard" data-r="${k}" style="--c:${r.color}"><span class="ri">${r.icon}</span><b>${r.name}</b><small>${esc(r.ab)} · ${esc(r.desc)}</small></button>`).join(""); $$(".rolecard", rl).forEach(b => b.onclick = () => { beep(700, .06, "triangle"); post("/api/role", { ...creds(), role: b.dataset.r }); }); }

@@ -25,6 +25,7 @@ const COLORS = ["#ff7aa8", "#ffc21a", "#22d3ee", "#7cf24a", "#c4a1ff", "#ff9a5c"
 const rooms = new Map();
 
 /* Personajes con una habilidad de apoyo que cada jugador usa una vez por función. */
+const AVATARS = 13; // caras en public/img/caras/cara-01.png a cara-13.png
 const ROLES = ["director", "guionista", "productor", "doble", "compositor"];
 /* Microjuegos: duración base en ms. Los jefes los juega todo el equipo sobre una misma barra. */
 const MGS = [
@@ -155,7 +156,7 @@ function stateFor(room, viewer /* "host" | player */) {
     reveal: room.phase === "reveal" ? room.reveal : null,
     mg: room.phase === "mg" || room.phase === "mgres" ? { ...room.mg, prog: totalProg(room) } : null,
     mgres: room.phase === "mgres" ? room.mgres : null,
-    players: [...room.players.values()].map(p => ({ id: p.id, name: p.name, color: p.color, role: p.role, used: p.used, score: p.score, answered: p.ans !== undefined, done: p.done, ok: p.ok, on: connected(p), wins: p.wins }))
+    players: [...room.players.values()].map(p => ({ id: p.id, name: p.name, color: p.color, avatar: p.avatar, role: p.role, used: p.used, score: p.score, answered: p.ans !== undefined, done: p.done, ok: p.ok, on: connected(p), wins: p.wins }))
   };
   if (room.phase === "film") st.filmInfo = FILMS[room.film];
   if (room.phase === "end") { st.win = room.win; st.awards = room.awards; st.stars = room.stars; }
@@ -289,9 +290,9 @@ function finish(room, win) {
   const fast = ps.filter(p => p.rtN).sort((a, b) => a.rtSum / a.rtN - b.rtSum / b.rtN)[0];
   const top = best("s", p => p.score), star = best("w", p => p.wins);
   room.awards = [
-    top && { title: "Máximo anotador", name: top.name, color: top.color, note: top.score + " pts" },
-    fast && { title: "Gatillo más rápido", name: fast.name, color: fast.color, note: (fast.rtSum / fast.rtN / 1000).toFixed(1) + " s en promedio" },
-    star && { title: "Estrella de los microjuegos", name: star.name, color: star.color, note: star.wins + " superados" }
+    top && { title: "Máximo anotador", name: top.name, color: top.color, avatar: top.avatar, note: top.score + " pts" },
+    fast && { title: "Gatillo más rápido", name: fast.name, color: fast.color, avatar: fast.avatar, note: (fast.rtSum / fast.rtN / 1000).toFixed(1) + " s en promedio" },
+    star && { title: "Estrella de los microjuegos", name: star.name, color: star.color, avatar: star.avatar, note: star.wins + " superados" }
   ].filter(Boolean);
   room.stars = win ? (room.hearts >= 4 ? 3 : room.hearts >= 2 ? 2 : 1) : 0;
   push(room);
@@ -327,11 +328,12 @@ function body(req) {
 const hostOf = (code, token) => { const r = rooms.get(String(code)); return r && token && r.hostToken === token ? r : null; };
 const playerOf = (code, id, token) => { const r = rooms.get(String(code)); const p = r?.players.get(id); return p && p.token === token ? { room: r, p } : null; };
 const lastReact = new Map();
+const freeAvatars = room => { const used = new Set([...room.players.values()].map(p => p.avatar)); return [...Array(AVATARS).keys()].map(i => i + 1).filter(i => !used.has(i)); };
 const roleCount = room => { const c = Object.fromEntries(ROLES.map(r => [r, 0])); room.players.forEach(p => c[p.role]++); return c; };
 
 async function api(req, res, url) {
   const route = url.pathname;
-  if (req.method === "GET" && route === "/api/info") return json(res, 200, { films: FILMS, max: MAX_PLAYERS, needsPassword: !!HOST_PASSWORD, roles: ROLES, plan: { full: buildPlan({ poeta: 1, contador: 1, tropic: 1 }, "full").length, quick: buildPlan({ poeta: 1, contador: 1, tropic: 1 }, "quick").length } });
+  if (req.method === "GET" && route === "/api/info") return json(res, 200, { films: FILMS, max: MAX_PLAYERS, avatars: AVATARS, needsPassword: !!HOST_PASSWORD, roles: ROLES, plan: { full: buildPlan({ poeta: 1, contador: 1, tropic: 1 }, "full").length, quick: buildPlan({ poeta: 1, contador: 1, tropic: 1 }, "quick").length } });
   if (req.method === "GET" && route === "/events") return sse(req, res, url);
   if (req.method !== "POST") return json(res, 405, { error: "method" });
   let b; try { b = await body(req); } catch (e) { return json(res, 400, { error: "bad_request" }); }
@@ -353,14 +355,22 @@ async function api(req, res, url) {
     const base = name; let k = 2; while (names.has(name.toLowerCase())) name = base.slice(0, 12) + " " + k++;
     const used = new Set([...room.players.values()].map(p => p.color)), rc = roleCount(room);
     const role = ROLES.slice().sort((a, c) => rc[a] - rc[c])[0];
-    const p = { id: rid(6), token: rid(), name, color: COLORS.find(c => !used.has(c)) || COLORS[room.players.size % COLORS.length], role, used: false, score: 0, res: new Set(), ans: undefined, rt: 0, result: null, done: false, ok: false, prog: 0, wins: 0, rtSum: 0, rtN: 0, lastPts: 0 };
+    const fa = freeAvatars(room), avatar = fa.length ? pick(fa) : null;
+    const p = { id: rid(6), token: rid(), name, avatar, color: COLORS.find(c => !used.has(c)) || COLORS[room.players.size % COLORS.length], role, used: false, score: 0, res: new Set(), ans: undefined, rt: 0, result: null, done: false, ok: false, prog: 0, wins: 0, rtSum: 0, rtN: 0, lastPts: 0 };
     room.players.set(p.id, p); push(room);
-    return json(res, 200, { id: p.id, token: p.token, name, color: p.color, role });
+    return json(res, 200, { id: p.id, token: p.token, name, color: p.color, role, avatar });
   }
   if (route === "/api/role") {
     const o = playerOf(b.code, b.id, b.token); if (!o) return json(res, 403, { error: "auth" });
     if (o.room.phase !== "lobby" || !ROLES.includes(b.role)) return json(res, 409, { error: "role" });
     o.p.role = b.role; push(o.room); return json(res, 200, { ok: true });
+  }
+  if (route === "/api/avatar") {
+    const o = playerOf(b.code, b.id, b.token); if (!o) return json(res, 403, { error: "auth" });
+    const a = b.avatar;
+    if (o.room.phase !== "lobby" || !Number.isInteger(a) || a < 1 || a > AVATARS) return json(res, 400, { error: "avatar" });
+    if ([...o.room.players.values()].some(p => p.avatar === a && p.id !== o.p.id)) return json(res, 409, { error: "taken" });
+    o.p.avatar = a; push(o.room); return json(res, 200, { ok: true });
   }
   if (route === "/api/answer") {
     const o = playerOf(b.code, b.id, b.token); if (!o) return json(res, 403, { error: "auth" });

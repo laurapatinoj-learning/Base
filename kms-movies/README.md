@@ -19,6 +19,7 @@ Todos los jugadores forman **un solo equipo** que comparte vidas y puntos.
 - **Preguntas:** el equipo las supera si al menos la mitad de los aciertos del grupo lo logra (cuenta el porcentaje de acierto de todos).
 - **Microjuegos:** entre pregunta y pregunta, cada jugador juega el mismo microjuego en su celular. Pasa si lo supera al menos la mitad del equipo. Cada ronda superada sube la velocidad.
 - **Jefes:** cada película termina con un jefe en el que todos suman toques a una misma barra. Vencerlo devuelve una vida.
+- **Avatares:** cada jugador elige una de las 13 caras del equipo (`server/public/img/caras`). Cada cara la usa una sola persona; si hay más de 13 jugadores, los últimos entran con la inicial de su apodo.
 - **Personajes:** cada jugador elige uno y puede usar su habilidad una vez por función.
 
 | Personaje | Habilidad |
